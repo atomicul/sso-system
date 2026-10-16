@@ -4,6 +4,7 @@
     <PackageId>Sso.Client</PackageId>
     <Description>Logs users in to an ASP.NET Core Identity app with the tokens of the SSO portal.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

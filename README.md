@@ -42,7 +42,7 @@ the `Dockerfile` together, then run `make api` and commit the regenerated client
 | `make reset-dev-database` | Deletes the `sso-db-data` volume, so the next run starts from an empty, freshly migrated database |
 | `make migration NAME=AddTags` | Adds an EF Core migration to `backend/Sso.Server/Data/Migrations` after a model change; `PROJECT=demo/Sso.Demo` adds it to the demo instead |
 | `make api` | Builds the API, copies its OpenAPI document to `frontend/openapi.json` and regenerates the frontend client |
-| `make build` | Publishes the API to `out/` with the built SPA in `out/wwwroot`; `VERSION=1.2.3` stamps the API assembly version |
+| `make build` | Publishes the API to `out/` with the built SPA in `out/wwwroot`, and packs `Sso.Client` into `packages/`; `VERSION=1.2.3` stamps both |
 | `make run` | Builds, then serves the API and the SPA together on `:5080` |
 | `make check` | Formatting, build, lint, type checks and tests for every project, and fails on model changes without a migration |
 
@@ -237,6 +237,17 @@ concurrent runs wait for each other, and exits non-zero when it fails. Its outpu
   older version; `migrate 0` reverts every migration.
 - `migrate --connection "<connection string>"` overrides `ConnectionStrings__Default`; prefer the environment variable,
   which keeps the password out of the process list.
+
+## Client library
+
+Every semver tag on `main` also packs `Sso.Client` with the same version as the API. The package is attached to the
+GitHub release and pushed to the repository owner's GitHub Packages feed. To reference it, add the feed with a token
+that can read packages:
+
+```sh
+dotnet nuget add source "https://nuget.pkg.github.com/OWNER/index.json" --name sso --username USER --password TOKEN
+dotnet add package Sso.Client --version 1.2.3
+```
 
 ## Deploying to a host
 
