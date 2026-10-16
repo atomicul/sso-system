@@ -1,0 +1,71 @@
+---
+- name: Ask where the signing key comes from
+  ansible.builtin.pause:
+    prompt: >-
+      {{ 'Replacing the installed signing key makes client apps reject logins until they have its public key. '
+         if sso_signing_key_installed.stat.exists else '' -}}
+      Signing key: press Enter to generate a new one, or type the local path of an existing PEM private key
+  register: sso_signing_key_source
+
+- name: Remember whether to generate the signing key
+  ansible.builtin.set_fact:
+    sso_generate_signing_key: "{{ sso_signing_key_source.user_input | length == 0 }}"
+
+- name: Ask where to keep the generated signing key
+  ansible.builtin.pause:
+    prompt: Local path to save the new private key to, as its backup [{{ sso_default_signing_key_path }}]
+  register: sso_signing_key_output
+  when: sso_generate_signing_key
+
+- name: Remember the signing key's local path
+  ansible.builtin.set_fact:
+    sso_signing_key_file: >-
+      {{ [sso_controller_directory, sso_chosen_signing_key_path | ansible.builtin.expanduser]
+         | ansible.builtin.path_join }}
+  vars:
+    sso_chosen_signing_key_path: >-
+      {{ sso_signing_key_source.user_input
+         or sso_signing_key_output.user_input | default('')
+         or sso_default_signing_key_path }}
+
+- name: Look for the signing key's local path
+  ansible.builtin.stat:
+    path: "{{ sso_signing_key_file }}"
+  delegate_to: localhost
+  become: false
+  register: sso_signing_key_file_stat
+
+- name: Require the key to exist, or its new path to be free
+  ansible.builtin.assert:
+    that: sso_signing_key_file_stat.stat.exists != sso_generate_signing_key
+    fail_msg: >-
+      {{ sso_signing_key_file }}
+      {{ 'already exists; pass a new path to generate a signing key' if sso_generate_signing_key
+         else "doesn't exist" }}
+    quiet: true
+
+- name: Generate the signing key
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python | dirname }}/generate-key-pair"
+      - "{{ sso_signing_key_file }}"
+  delegate_to: localhost
+  become: false
+  changed_when: true
+  when: sso_generate_signing_key
+
+- name: Copy the signing key to the host
+  ansible.builtin.copy:
+    src: "{{ sso_signing_key_file }}"
+    dest: "{{ sso_config_dir }}/signing-key.pem"
+    owner: root
+    group: sso
+    mode: "0640"
+  notify: Restart the app
+
+- name: Show where the public key is, for client apps
+  ansible.builtin.debug:
+    msg: >-
+      Client apps check the SSO's tokens with the public key
+      {{ (sso_signing_key_file | ansible.builtin.splitext | first) ~ '.pub.pem' }}
+  when: sso_generate_signing_key

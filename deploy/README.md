@@ -55,9 +55,13 @@ It only asks for what the host doesn't have yet:
 - The `sso` database password, which `setup-database` showed.
 - The PFX certificate that encrypts the app's Data Protection keys: press Enter to generate one, saved locally as its
   backup, or type the path of an existing PFX. Either way, it then asks for the PFX's password.
+- The RSA key the SSO signs its tokens with: press Enter to generate one with `generate-key-pair`, saved locally as
+  its backup next to its public key (`<host>-sso-signing.pem` and `<host>-sso-signing.pub.pem` by default), or type
+  the path of an existing PEM private key. Client apps check the SSO's tokens with the public key.
 
-To change either of them on a host that has them, pass `--change-database-password` or `--change-certificate`.
-Replacing the certificate logs every user out, and losing it does too: keep the PFX and its password.
+To change any of them on a host that has them, pass `--change-database-password`, `--change-certificate` or
+`--change-signing-key`. Replacing the certificate logs every user out, and losing it does too: keep the PFX and its
+password. Replacing the signing key makes client apps reject logins until they have its new public key.
 
 ### `setup-tls`
 
@@ -95,6 +99,7 @@ to `key.pub.pem`, both as PEM. It refuses to overwrite either file.
 | `/etc/sso/database-admin.env` | The `sa` password and connection string, for migrations (root only) |
 | `/etc/sso/database.env` | The app's connection string (root only; systemd passes it to the app) |
 | `/etc/sso/certificate.env`, `dataprotection.pfx` | The certificate's password (root only) and the PFX (readable by the app) |
+| `/etc/sso/signing-key.pem` | The private key the SSO signs its tokens with (readable by the app) |
 | `/etc/sso/tls/fullchain.pem`, `privkey.pem` | The HTTPS certificate and its key (readable by the app), copied from `/etc/letsencrypt` by `/usr/local/sbin/sso-install-certificate` |
 | `/var/lib/sso/acme` | The web root certbot writes ACME challenges to, which the app serves |
 | `/opt/sso/releases/<tag>` | Each installed release; `/opt/sso/current` links to the one running |

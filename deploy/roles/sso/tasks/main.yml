@@ -56,6 +56,11 @@
     path: "{{ sso_config_dir }}/certificate.env"
   register: sso_certificate_env
 
+- name: Look for the signing key on the host
+  ansible.builtin.stat:
+    path: "{{ sso_config_dir }}/signing-key.pem"
+  register: sso_signing_key_installed
+
 - name: Configure the database password
   ansible.builtin.include_tasks: database.yml
   when: sso_change_database_password | bool or not sso_database_env.stat.exists
@@ -63,6 +68,10 @@
 - name: Configure the Data Protection certificate
   ansible.builtin.include_tasks: certificate.yml
   when: sso_change_certificate | bool or not sso_certificate_env.stat.exists
+
+- name: Configure the key the SSO signs its tokens with
+  ansible.builtin.include_tasks: signing_key.yml
+  when: sso_change_signing_key | bool or not sso_signing_key_installed.stat.exists
 
 - name: Install the app's service
   ansible.builtin.template:
