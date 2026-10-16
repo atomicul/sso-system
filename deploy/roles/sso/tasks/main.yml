@@ -30,6 +30,10 @@
     remote_src: true
     creates: "{{ sso_install_dir }}/releases/{{ release_tag }}/Sso.Server.dll"
 
+- name: Install the client apps of the given directory
+  ansible.builtin.include_tasks: client_apps.yml
+  when: sso_client_apps_source | length > 0
+
 - name: Write the app's settings
   ansible.builtin.include_tasks: settings.yml
 

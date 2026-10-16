@@ -63,6 +63,20 @@ To change any of them on a host that has them, pass `--change-database-password`
 `--change-signing-key`. Replacing the certificate logs every user out, and losing it does too: keep the PFX and its
 password. Replacing the signing key makes client apps reject logins until they have its new public key.
 
+`--client-apps DIR` replaces the apps the portal lists (see the [root README](../README.md#client-apps)) with those of
+a local directory, and removes the files of the ones it doesn't have. Without it, the host keeps the apps it has. The
+directory holds:
+
+- `apps.json`, each app's name and the endpoint that receives its tokens, keyed by the app's key:
+
+  ```json
+  { "billing": { "Name": "Billing", "Endpoint": "https://billing.example.com/api/auth/sso" } }
+  ```
+
+- `<key>.pub.pem` for every app: the app's public key, which the SSO encrypts its tokens with. `generate-key-pair`
+  writes one with its private key, which goes to the app.
+- Optionally `<key>.jpg`, `<key>.png` or `<key>.webp`: the app's icon.
+
 ### `setup-tls`
 
 Gets a Let's Encrypt certificate for the domain with certbot and serves the app over HTTPS with it, redirecting HTTP to
@@ -99,6 +113,7 @@ to `key.pub.pem`, both as PEM. It refuses to overwrite either file.
 | `/etc/sso/database-admin.env` | The `sa` password and connection string, for migrations (root only) |
 | `/etc/sso/database.env` | The app's connection string (root only; systemd passes it to the app) |
 | `/etc/sso/certificate.env`, `dataprotection.pfx` | The certificate's password (root only) and the PFX (readable by the app) |
+| `/etc/sso/apps` | The client apps' `apps.json`, public keys and icons (readable by the app) |
 | `/etc/sso/signing-key.pem` | The private key the SSO signs its tokens with (readable by the app) |
 | `/etc/sso/tls/fullchain.pem`, `privkey.pem` | The HTTPS certificate and its key (readable by the app), copied from `/etc/letsencrypt` by `/usr/local/sbin/sso-install-certificate` |
 | `/var/lib/sso/acme` | The web root certbot writes ACME challenges to, which the app serves |

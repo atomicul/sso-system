@@ -1,0 +1,49 @@
+---
+- name: Find the client apps' settings, public keys and icons to install
+  ansible.builtin.find:
+    paths: "{{ sso_client_apps_source }}"
+    patterns: "apps.json,*.pub.pem,*.jpg,*.png,*.webp"
+  delegate_to: localhost
+  become: false
+  register: sso_new_client_app_files
+
+- name: Require the client apps' settings in apps.json
+  ansible.builtin.assert:
+    that: "'apps.json' in sso_new_client_app_files.files | map(attribute='path') | map('basename')"
+    fail_msg: "{{ sso_client_apps_source }} has no apps.json"
+    quiet: true
+
+- name: Create the client apps' directory
+  ansible.builtin.file:
+    path: "{{ sso_client_apps_dir }}"
+    state: directory
+    owner: root
+    group: sso
+    mode: "0750"
+
+- name: Find the client apps' files the host has
+  ansible.builtin.find:
+    paths: "{{ sso_client_apps_dir }}"
+  register: sso_installed_client_app_files
+
+- name: Copy the client apps' files to the host
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ sso_client_apps_dir }}/{{ item.path | basename }}"
+    owner: root
+    group: sso
+    mode: "0640"
+  loop: "{{ sso_new_client_app_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  notify: Restart the app
+
+- name: Remove the host's client app files that the directory doesn't have
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ sso_installed_client_app_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: item.path | basename not in sso_new_client_app_files.files | map(attribute='path') | map('basename')
+  notify: Restart the app
