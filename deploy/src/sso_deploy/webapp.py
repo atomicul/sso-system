@@ -19,10 +19,16 @@ def main() -> None:
         action="store_true",
         help="replace the host's Data Protection certificate, which logs every user out",
     )
+    parser.add_argument(
+        "--change-signing-key",
+        action="store_true",
+        help="replace the key the SSO signs its tokens with, which client apps reject until they have its public key",
+    )
     args = parser.parse_args()
     variables = {
         "sso_change_database_password": args.change_database_password,
         "sso_change_certificate": args.change_certificate,
+        "sso_change_signing_key": args.change_signing_key,
         "sso_controller_directory": os.getcwd(),
     }
     sys.exit(run_playbook("webapp.yml", args, variables=variables))

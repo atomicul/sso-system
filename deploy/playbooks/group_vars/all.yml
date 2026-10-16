@@ -37,6 +37,8 @@ sso_settings:
   DataProtection:
     Certificate:
       Path: "{{ sso_config_dir }}/dataprotection.pfx"
+  SigningKey:
+    Path: "{{ sso_config_dir }}/signing-key.pem"
   AcmeChallenge:
     WebRoot: "{{ sso_acme_webroot }}"
 
