@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Sso.Server;
+using Sso.Server.Apps;
 using Sso.Server.Auth;
 using Sso.Server.Data;
 
@@ -12,11 +13,12 @@ var appName = builder.Configuration["AppName"] ?? builder.Environment.Applicatio
 var isGeneratingOpenApiDocument = Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider";
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
-if (!isGeneratingOpenApiDocument)
+if (!isGeneratingOpenApiDocument && !EF.IsDesignTime)
 {
     builder.Services.AddDataProtection()
         .PersistKeysToDbContext<AppDbContext>()
         .ProtectKeysWithConfiguredCertificate(builder.Configuration);
+    builder.Services.AddClientApps(builder.Configuration);
 }
 
 builder.Services.AddAuthorization();
@@ -80,6 +82,7 @@ app.MapAcmeChallenge();
 
 var api = app.MapGroup("/api").RequireRateLimiting(RateLimits.Api);
 api.MapAuth();
+api.MapApps();
 api.MapFallback(() => TypedResults.NotFound());
 app.MapFallbackToFile("index.html");
 
