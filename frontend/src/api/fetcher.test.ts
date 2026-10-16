@@ -106,18 +106,18 @@ describe('fetcher', () => {
 })
 
 describe('ApiError', () => {
-  const pastDueDate = "An open todo can't be due in the past."
+  const invalidEmail = "Email 'ada' is invalid."
 
   it('words a validation error by its code in the user language', async () => {
     await i18n.changeLanguage('ro')
     const error = new ApiError(400, {
       issues: [
-        { pointer: '#/dueDate', detail: pastDueDate, code: 'DueDateInPast' },
+        { pointer: '#/newEmail', detail: invalidEmail, code: 'InvalidEmail' },
       ],
     })
 
     expect(error.errors).toEqual([
-      { pointer: '#/dueDate', message: ro.validationErrors.DueDateInPast },
+      { pointer: '#/newEmail', message: ro.validationErrors.InvalidEmail },
     ])
   })
 
@@ -151,12 +151,12 @@ describe('ApiError', () => {
   it("keeps the API's English wording in English", () => {
     const error = new ApiError(400, {
       issues: [
-        { pointer: '#/dueDate', detail: pastDueDate, code: 'DueDateInPast' },
+        { pointer: '#/newEmail', detail: invalidEmail, code: 'InvalidEmail' },
       ],
     })
 
     expect(error.errors).toEqual([
-      { pointer: '#/dueDate', message: pastDueDate },
+      { pointer: '#/newEmail', message: invalidEmail },
     ])
   })
 })

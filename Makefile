@@ -3,11 +3,11 @@ SPA_URL ?= http://localhost:5173
 OUT ?= out
 VERSION ?=
 DB_IMAGE ?= mcr.microsoft.com/mssql/server:2025-latest
-DB_CONTAINER ?= todoapp-db
+DB_CONTAINER ?= sso-db
 DB_VOLUME ?= $(DB_CONTAINER)-data
 DB_PORT ?= 1433
 DB_PASSWORD ?= Dev-Passw0rd
-DB_CONNECTION ?= Server=localhost,$(DB_PORT);Database=TodoApp;User Id=sa;Password=$(DB_PASSWORD);TrustServerCertificate=True
+DB_CONNECTION ?= Server=localhost,$(DB_PORT);Database=Sso;User Id=sa;Password=$(DB_PASSWORD);TrustServerCertificate=True
 
 SOLUTION := backend/Sso.Server.slnx
 API_PROJECT := backend/Sso.Server

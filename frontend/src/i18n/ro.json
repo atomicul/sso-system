@@ -14,7 +14,7 @@
   },
   "login": {
     "title": "Autentificare",
-    "description": "Bine ai revenit! Autentifică-te ca să-ți vezi sarcinile.",
+    "description": "Bine ai revenit! Autentifică-te ca să-ți deschizi aplicațiile.",
     "newHere": "Ești nou aici?",
     "createAccount": "Creează un cont",
     "submit": "Autentifică-te",
@@ -25,7 +25,7 @@
   },
   "register": {
     "title": "Creează un cont",
-    "description": "Înregistrează-te ca să începi să-ți urmărești sarcinile.",
+    "description": "Înregistrează-te ca să ai acces la aplicațiile tale.",
     "haveAccount": "Ai deja un cont?",
     "logIn": "Autentifică-te",
     "submit": "Creează contul",
@@ -51,7 +51,7 @@
     "sent": "Ți-am trimis un nou link de confirmare la {{email}}."
   },
   "layout": {
-    "todos": "Sarcini",
+    "title": "SSO",
     "refresh": "Reîmprospătează"
   },
   "accountMenu": {
@@ -68,28 +68,15 @@
     "logOut": "Deconectează-te",
     "emailAndPassword": "Email și parolă"
   },
-  "todos": {
-    "title": "Titlu",
-    "titlePlaceholder": "Ce ai de făcut?",
-    "dueDate": "Termen",
-    "add": "Adaugă",
-    "save": "Salvează",
-    "edit": "Editează {{title}}",
-    "editTitle": "Editează sarcina",
-    "delete": "Șterge {{title}}",
-    "markDone": "Marchează {{title}} ca finalizată",
-    "markOpen": "Marchează {{title}} ca nefinalizată",
-    "due": "Termen: {{date, datetime(dateStyle: medium)}}",
-    "loading": "Se încarcă sarcinile…",
-    "empty": "Nimic de făcut încă. Adaugă prima sarcină mai sus."
+  "home": {
+    "signedIn": "Ești autentificat."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
     "description": "Pagina pe care o cauți nu există sau a fost mutată.",
-    "back": "Înapoi la sarcini"
+    "back": "Înapoi la aplicațiile tale"
   },
   "validationErrors": {
-    "DueDateInPast": "O sarcină nefinalizată nu poate avea termenul în trecut.",
     "InvalidEmail": "Adresa de email nu este validă.",
     "InvalidUserName": "Adresa de email conține caractere nepermise.",
     "DuplicateUserName": "Există deja un cont cu această adresă de email.",

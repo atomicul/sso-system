@@ -6,17 +6,17 @@ follow when changing the API.
 
 ## Endpoints
 
-Each feature has a folder, such as `Todos/`, holding its entities, its contracts and a `MapX` extension that maps a
-tagged group of handlers (`TodoEndpoints.MapTodos`). `Program.cs` maps every feature under the `/api` group.
+Each feature has a folder, such as `Auth/`, holding its entities, its contracts and a `MapX` extension that maps a
+tagged group of handlers (`AuthEndpoints.MapAuth`). `Program.cs` maps every feature under the `/api` group.
 
 Handlers are static methods that return `TypedResults`, or a `Results<…>` union when they can answer in several ways,
 so the OpenAPI document lists every response without extra attributes. Their XML doc comments, and those of the
 contracts' records, become the summaries and descriptions in the document:
 
 ```csharp
-/// <summary>Gets one of the current user's todos.</summary>
-/// <param name="id">Identifier of the todo.</param>
-public static async Task<Results<Ok<TodoResponse>, NotFound>> GetById(int id, AppDbContext db, CancellationToken ct)
+/// <summary>Cancels the signed-in user's email change, so the links sent for it stop working.</summary>
+public static async Task<Results<NoContent, NotFound>> CancelPendingEmail(
+    ClaimsPrincipal principal, UserManager<IdentityUser> users)
 ```
 
 Identity's own endpoints come from `MapIdentityApi`, under `/api/auth`. `Auth/AuthEndpoints.cs` adjusts them with
@@ -62,7 +62,7 @@ fails:
 
   They run only once every attribute passes, as with ASP.NET's own validation.
 - **Rules that need the database** run in the handler, after it loads what it needs, and answer with
-  `ValidationProblems.For([new ValidationError(nameof(TodoRequest.Title), "DuplicateTitle", "…")])`. Add
+  `ValidationProblems.For([new ValidationError(…)])`, as `AccountChanges` does for an email another user has. Add
   `ValidationProblem` to the handler's `Results<…>`. When the database can enforce the rule, as a unique index does,
   keep the constraint too, so concurrent requests can't both pass the check, and answer its `DbUpdateException` with
   the same error.
@@ -85,17 +85,6 @@ default, a transformer writes it there:
 - `Validation/ValidationIssuesSchemaTransformer.cs` documents the `issues` member of validation problems.
 - `BearerSecurityTransformer.cs` adds the bearer scheme and marks the operations that require it.
 
-## Per-user data
-
-An entity that belongs to a user implements `Data/IOwnedByUser`. `AppDbContext` then links it to its owner, filters
-every query to the signed-in user and stamps the owner on new rows. Handlers never filter or assign by user, and one
-user's ids are simply not found for another:
-
-```csharp
-var todo = await db.Todos.FirstOrDefaultAsync(t => t.Id == id, ct);
-return todo is null ? TypedResults.NotFound() : TypedResults.Ok(TodoResponse.From(todo));
-```
-
 ## Cloud services
 
 The root README's [Cloud services](../README.md#cloud-services) section sets the rules; in code, each feature that
@@ -112,11 +101,11 @@ uses one looks like the emails:
 
 `Sso.Server.Tests` boots the whole API with `WebApplicationFactory` against SQL Server in a Docker container that
 Testcontainers starts and removes for each run, so the tests also apply the real migrations. Every test registers its
-own user, and all data belongs to a user, so tests share the database without resetting it. Identity's emails are
+own user, so tests share the database without resetting it. Identity's emails are
 captured instead of logged, which lets tests follow confirmation links. The tests of what the API sends through Dapr
 run a Dapr sidecar in another container, whose `bindings.localstorage` bindings write every message they get to a
 temporary directory for the tests to read. Run them alone with `dotnet test --solution backend/Sso.Server.slnx`.
 
-Tests act as a client would, through the helpers in `TestUsers` and `TodoClient`. A refused request is read with
+Tests act as a client would, through the helpers in `TestUsers`. A refused request is read with
 `ReadValidationProblemAsync`, which asserts the 400 and returns both the problem as ASP.NET's clients read it and its
 issues, so a test can check the field, the code or both.

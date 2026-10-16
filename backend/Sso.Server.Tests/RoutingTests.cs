@@ -19,7 +19,7 @@ public class RoutingTests(SsoServerFactory factory)
     {
         var unreachable = factory.WithSettings(new()
         {
-            ["ConnectionStrings:Default"] = "Server=127.0.0.1,1;Database=TodoApp;Connect Timeout=1;TrustServerCertificate=True",
+            ["ConnectionStrings:Default"] = "Server=127.0.0.1,1;Database=Sso;Connect Timeout=1;TrustServerCertificate=True",
         });
 
         var response = await unreachable.CreateClient().GetAsync("/health", TestContext.Current.CancellationToken);

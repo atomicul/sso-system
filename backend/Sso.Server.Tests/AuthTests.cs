@@ -19,7 +19,7 @@ public class AuthTests(SsoServerFactory factory)
     [Fact]
     public async Task Anonymous_request_is_unauthorized()
     {
-        var response = await factory.CreateClient().GetAsync("/api/todos", CancellationToken);
+        var response = await factory.CreateClient().GetAsync("/api/auth/manage/info", CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -83,7 +83,7 @@ public class AuthTests(SsoServerFactory factory)
     {
         var client = await factory.CreateUserClientAsync();
 
-        var response = await client.GetAsync("/api/todos", CancellationToken);
+        var response = await client.GetAsync("/api/auth/manage/info", CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -95,9 +95,9 @@ public class AuthTests(SsoServerFactory factory)
         var email = await client.RegisterConfirmedAsync(factory);
 
         (await client.LoginAsync(email, useCookies: true)).EnsureSuccessStatusCode();
-        var duringSession = await client.GetAsync("/api/todos", CancellationToken);
+        var duringSession = await client.GetAsync("/api/auth/manage/info", CancellationToken);
         (await client.PostAsync("/api/auth/logout", null, CancellationToken)).EnsureSuccessStatusCode();
-        var afterLogout = await client.GetAsync("/api/todos", CancellationToken);
+        var afterLogout = await client.GetAsync("/api/auth/manage/info", CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, duringSession.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, afterLogout.StatusCode);

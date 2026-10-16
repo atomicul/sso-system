@@ -13,7 +13,7 @@
   },
   "login": {
     "title": "Log in",
-    "description": "Welcome back! Log in to see your todos.",
+    "description": "Welcome back! Log in to open your apps.",
     "newHere": "New here?",
     "createAccount": "Create an account",
     "submit": "Log in",
@@ -24,7 +24,7 @@
   },
   "register": {
     "title": "Create an account",
-    "description": "Sign up to start keeping track of your todos.",
+    "description": "Sign up to get access to your apps.",
     "haveAccount": "Already have an account?",
     "logIn": "Log in",
     "submit": "Create account",
@@ -50,7 +50,7 @@
     "sent": "We sent a new confirmation link to {{email}}."
   },
   "layout": {
-    "todos": "Todos",
+    "title": "SSO",
     "refresh": "Refresh"
   },
   "accountMenu": {
@@ -67,25 +67,13 @@
     "logOut": "Log out",
     "emailAndPassword": "Email and password"
   },
-  "todos": {
-    "title": "Title",
-    "titlePlaceholder": "What needs doing?",
-    "dueDate": "Due date",
-    "add": "Add",
-    "save": "Save",
-    "edit": "Edit {{title}}",
-    "editTitle": "Edit todo",
-    "delete": "Delete {{title}}",
-    "markDone": "Mark {{title}} as done",
-    "markOpen": "Mark {{title}} as open",
-    "due": "Due {{date, datetime(dateStyle: medium)}}",
-    "loading": "Loading todos…",
-    "empty": "Nothing to do yet. Add your first todo above."
+  "home": {
+    "signedIn": "You are signed in."
   },
   "notFound": {
     "title": "Page not found",
     "description": "The page you are looking for does not exist or has moved.",
-    "back": "Back to your todos"
+    "back": "Back to your apps"
   },
   "page": {
     "back": "Back"

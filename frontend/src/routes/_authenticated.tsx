@@ -22,7 +22,7 @@ function AuthenticatedLayout() {
       <header className="shrink-0 border-b">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 p-4">
           <span className="font-heading font-semibold">
-            {t('layout.todos')}
+            {t('layout.title')}
           </span>
           <div className="flex items-center gap-1">
             <RefreshButton />

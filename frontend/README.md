@@ -33,31 +33,31 @@ Failed mutations are handled once, in `src/router.ts`:
   their one retry.
 
 ```ts
-const { mutateAsync: createTodo } = useCreateTodo({
+const { mutateAsync: changeEmail } = usePostApiAuthManageInfo({
   mutation: {
-    meta: { handlesErrors: true, invalidates: [getGetTodosQueryKey()] },
+    meta: { handlesErrors: true, invalidates: [getGetPendingEmailQueryKey()] },
   },
 })
 ```
 
 ## Optimistic updates
 
-A change the user expects to take effect at once, as checking a todo does, shows while its mutation is pending,
+A change the user expects to take effect at once, as switching a setting on, shows while its mutation is pending,
 from the mutation's own `variables`, rather than waiting for the API and the refetch after it:
 
 ```tsx
-const update = useUpdateTodo({ mutation })
-const isComplete = update.isPending
-  ? update.variables.data.isComplete
-  : todo.isComplete
+const update = useUpdateSetting({ mutation })
+const isEnabled = update.isPending
+  ? update.variables.data.isEnabled
+  : setting.isEnabled
 ```
 
 - The mutation stays pending until its queries are refetched (see [Error handling](#error-handling)), so the guess
   gives way to the API's data without flickering back in between.
 - A failed mutation stops being pending, so the page shows the data as it was, and the error is toasted. Nothing
   needs undoing.
-- Mutations that change the same resource share a `scope` (``scope: { id: `todo-${todo.id}` }``), which runs them one
-  after another, so the controls stay enabled and quick changes reach the API in the order they were made.
+- Mutations that change the same resource share a `scope` (``scope: { id: `setting-${setting.id}` }``), which runs
+  them one after another, so the controls stay enabled and quick changes reach the API in the order they were made.
 
 This suits a change shown in one place, the component that makes it. Once other components show the same data,
 write the guess into the cache instead, in the mutation's `onMutate`, and put the cached data back in its `onError`,
@@ -71,7 +71,10 @@ Forms use `react-hook-form` with `zodResolver` over the generated schemas, so th
 before sending:
 
 ```ts
-const form = useForm({ resolver: zodResolver(CreateTodoBody), defaultValues })
+const form = useForm({
+  resolver: zodResolver(PostApiAuthManageInfoBody),
+  defaultValues,
+})
 ```
 
 - zod words its messages itself, in the user's language. Where its wording explains nothing, as for a `pattern`, a
@@ -91,9 +94,9 @@ the reference: `t()` only accepts keys of `en.json`, and a test fails when `ro.j
 
 - Components translate with `useTranslation()`, so they render again when the language changes; code outside them,
   such as `fetcher.ts`, uses `i18n.t` from `@/i18n`.
-- Values go in as interpolations, not concatenations: `t('todos.edit', { title })`. Counts use i18next's plural
-  suffixes (`_one`, `_few`, `_other`, by each language's rules) and dates its `datetime` format, so both follow the
-  language.
+- Values go in as interpolations, not concatenations: `t('account.emailLinkSent', { email })`. Counts use i18next's
+  plural suffixes (`_one`, `_few`, `_other`, by each language's rules) and dates its `datetime` format, so both
+  follow the language.
 - zod's own messages switch to the same language, through its locale in `src/i18n/index.ts`.
 - `validationErrors` translates the codes of the API's validation errors. Only other languages need it: English
   falls back to the API's own wording, so `en.json` has none.
@@ -203,17 +206,17 @@ The query cache is the one place a page's data lives. A route's `loader` only fi
 data rather than a loading state, and the page's components read the data back through the generated query hooks:
 
 ```tsx
-export const Route = createFileRoute('/_authenticated/')({
+export const Route = createFileRoute('/_authenticated/account')({
   loader: ({ context }) =>
     context.queryClient.query({
-      ...getGetTodosQueryOptions(),
+      ...getGetPendingEmailQueryOptions(),
       staleTime: 'static',
     }),
-  component: TodosPage,
+  component: AccountPage,
 })
 
-export function TodoList() {
-  const { data: todos, isPending, error } = useGetTodos()
+export function EmailForm() {
+  const { data: pending } = useGetPendingEmail()
   // ...
 }
 ```
@@ -234,7 +237,7 @@ session to send the user to the login page, and loaders take the `queryClient` f
 
 ## Refreshing
 
-A page's data can change while it is open, as when the user edits their todos on another device, so the signed-in
+A page's data can change while it is open, as when the user asks for an email change on another device, so the signed-in
 layout lets the user refetch it: by pulling the page down from the top on touch screens (`PullToRefresh`,
 `src/components/pull-to-refresh.tsx`, which is the scrolling section under the header), and with the button in the
 header elsewhere. The button hides on touch screens (Tailwind's `pointer-coarse:` variant) rather than below a width,

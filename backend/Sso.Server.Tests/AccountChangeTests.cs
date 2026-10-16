@@ -126,7 +126,7 @@ public class AccountChangeTests(SsoServerFactory factory)
 
         (await client.ChangeInfoAsync(new InfoRequest { OldPassword = TestUsers.Password, NewPassword = NewPassword }))
             .EnsureSuccessStatusCode();
-        var response = await client.GetAsync("/api/todos", CancellationToken);
+        var response = await client.GetAsync("/api/auth/manage/info", CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -143,7 +143,7 @@ public class AccountChangeTests(SsoServerFactory factory)
 
         (await client.ChangeInfoAsync(new InfoRequest { OldPassword = TestUsers.Password, NewPassword = NewPassword }))
             .EnsureSuccessStatusCode();
-        var response = await otherSession.GetAsync("/api/todos", CancellationToken);
+        var response = await otherSession.GetAsync("/api/auth/manage/info", CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
