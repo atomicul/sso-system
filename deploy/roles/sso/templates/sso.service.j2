@@ -1,18 +1,18 @@
 [Unit]
-Description=Todo app
+Description=SSO
 Wants=network-online.target
 After=network-online.target mssql-server.service
 
 [Service]
 Type=exec
-User=todoapp
-Group=todoapp
+User=sso
+Group=sso
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-WorkingDirectory={{ todoapp_install_dir }}/current
-ExecStart={{ dotnet_root }}/dotnet {{ todoapp_install_dir }}/current/Sso.Server.dll
-EnvironmentFile={{ todoapp_config_dir }}/database.env
-EnvironmentFile={{ todoapp_config_dir }}/certificate.env
+WorkingDirectory={{ sso_install_dir }}/current
+ExecStart={{ dotnet_root }}/dotnet {{ sso_install_dir }}/current/Sso.Server.dll
+EnvironmentFile={{ sso_config_dir }}/database.env
+EnvironmentFile={{ sso_config_dir }}/certificate.env
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_ROOT={{ dotnet_root }}
 Restart=on-failure

@@ -1,0 +1,5 @@
+---
+sso_change_database_password: false
+sso_change_certificate: false
+sso_controller_directory: "{{ lookup('ansible.builtin.env', 'PWD') }}"
+sso_default_certificate_path: "{{ inventory_hostname }}-dataprotection.pfx"

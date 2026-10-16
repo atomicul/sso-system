@@ -1,6 +1,6 @@
 # Deploy
 
-Sets up the todo app and its database on a single Ubuntu host with Ansible. uv is the only requirement: it installs
+Sets up the SSO and its database on a single Ubuntu host with Ansible. uv is the only requirement: it installs
 the pinned Python, Ansible and every other dependency from `uv.lock`.
 
 ## Requirements
@@ -26,33 +26,33 @@ two commands upgrade the host to a new release.
 To serve HTTPS, point a domain name at the host and, once the app is set up, run `setup-tls` with that domain:
 
 ```sh
-uv run setup-tls ubuntu@203.0.113.10 todo.example.com --email you@example.com
+uv run setup-tls ubuntu@203.0.113.10 sso.example.com --email you@example.com
 ```
 
 ### `setup-database`
 
 Installs SQL Server and Docker, applies the release's migrations with the `migrate` command of its Docker image, and
-creates the `todoapp` login the app connects with, which can read and write the app's tables but not change them.
+creates the `sso` login the app connects with, which can read and write the app's tables but not change them.
 
 The first run generates two passwords:
 
-- The `todoapp` login's password, which it **shows once** at the end of the run and stores nowhere. `setup-webapp`
+- The `sso` login's password, which it **shows once** at the end of the run and stores nowhere. `setup-webapp`
   asks for it.
-- The `sa` password, kept for later migrations in `/etc/todoapp/database-admin.env`, which only root can read.
+- The `sa` password, kept for later migrations in `/etc/sso/database-admin.env`, which only root can read.
 
 SQL Server listens on `127.0.0.1` only. It runs as the Express edition, which is free in production; set
 `mssql_edition` in `playbooks/group_vars/all.yml` before the first run to use a licensed one.
 
 ### `setup-webapp`
 
-Installs the ASP.NET Core runtime and the release's zip, and runs the app as the `todoapp` systemd service on port
+Installs the ASP.NET Core runtime and the release's zip, and runs the app as the `sso` systemd service on port
 `80`, then waits for `/health` to answer `Healthy`. It serves plain HTTP until `setup-tls` gives the host a
 certificate, and from then on HTTPS on port `443` as well. To terminate HTTPS in a reverse proxy instead, skip
 `setup-tls` and set the API's `TrustedProxies` (see the [root README](../README.md#rate-limiting)).
 
 It only asks for what the host doesn't have yet:
 
-- The `todoapp` database password, which `setup-database` showed.
+- The `sso` database password, which `setup-database` showed.
 - The PFX certificate that encrypts the app's Data Protection keys: press Enter to generate one, saved locally as its
   backup, or type the path of an existing PFX. Either way, it then asks for the PFX's password.
 
@@ -66,10 +66,10 @@ HTTPS (see the [root README](../README.md#https)). It needs:
 
 - The app installed by `setup-webapp`, from a release that serves ACME challenges.
 - The domain's DNS pointing at the host, and port `80` reachable from the internet: Let's Encrypt checks that the
-  domain is yours by fetching a file that certbot puts in `/var/lib/todoapp/acme`, which the app serves.
+  domain is yours by fetching a file that certbot puts in `/var/lib/sso/acme`, which the app serves.
 - Optionally `--email`, for Let's Encrypt to write to about the account. Without it, the account has no address.
 
-certbot's timer renews the certificate before it expires. Its hook copies each new certificate to `/etc/todoapp/tls`,
+certbot's timer renews the certificate before it expires. Its hook copies each new certificate to `/etc/sso/tls`,
 where the app can read it, and restarts the app, so the app restarts only when the certificate changes.
 `sudo certbot renew --dry-run` on the host tests a renewal. Running `setup-tls` again with the same domain changes
 nothing.
@@ -86,20 +86,20 @@ asking for its password. It refuses to overwrite a file.
 
 | Path | Holds |
 |---|---|
-| `/etc/todoapp/appsettings.Production.json` | The app's settings other than secrets, from `todoapp_settings` in `playbooks/group_vars/all.yml`; each release links to it |
-| `/etc/todoapp/database-admin.env` | The `sa` password and connection string, for migrations (root only) |
-| `/etc/todoapp/database.env` | The app's connection string (root only; systemd passes it to the app) |
-| `/etc/todoapp/certificate.env`, `dataprotection.pfx` | The certificate's password (root only) and the PFX (readable by the app) |
-| `/etc/todoapp/tls/fullchain.pem`, `privkey.pem` | The HTTPS certificate and its key (readable by the app), copied from `/etc/letsencrypt` by `/usr/local/sbin/todoapp-install-certificate` |
-| `/var/lib/todoapp/acme` | The web root certbot writes ACME challenges to, which the app serves |
-| `/opt/todoapp/releases/<tag>` | Each installed release; `/opt/todoapp/current` links to the one running |
+| `/etc/sso/appsettings.Production.json` | The app's settings other than secrets, from `sso_settings` in `playbooks/group_vars/all.yml`; each release links to it |
+| `/etc/sso/database-admin.env` | The `sa` password and connection string, for migrations (root only) |
+| `/etc/sso/database.env` | The app's connection string (root only; systemd passes it to the app) |
+| `/etc/sso/certificate.env`, `dataprotection.pfx` | The certificate's password (root only) and the PFX (readable by the app) |
+| `/etc/sso/tls/fullchain.pem`, `privkey.pem` | The HTTPS certificate and its key (readable by the app), copied from `/etc/letsencrypt` by `/usr/local/sbin/sso-install-certificate` |
+| `/var/lib/sso/acme` | The web root certbot writes ACME challenges to, which the app serves |
+| `/opt/sso/releases/<tag>` | Each installed release; `/opt/sso/current` links to the one running |
 | `/opt/dotnet/<version>` | The ASP.NET Core runtime |
 
 Environment variables override the JSON file, so the two secrets stay in the `.env` files, which systemd passes to
 the app. To change another setting, such as `TrustedProxies` or `RateLimits` from the
-[root README](../README.md#environment-variables), add it to `todoapp_settings` and run `setup-webapp` again.
+[root README](../README.md#environment-variables), add it to `sso_settings` and run `setup-webapp` again.
 
-`journalctl -u todoapp` shows the app's logs.
+`journalctl -u sso` shows the app's logs.
 
 ## Pinned versions
 

@@ -2,8 +2,8 @@
 
 import sys
 
-from todoapp_deploy.passwords import generate_password
-from todoapp_deploy.runner import add_release_argument, argument_parser, run_playbook
+from sso_deploy.passwords import generate_password
+from sso_deploy.runner import add_release_argument, argument_parser, run_playbook
 
 
 def main() -> None:
@@ -11,7 +11,7 @@ def main() -> None:
     add_release_argument(parser)
     args = parser.parse_args()
     secrets = {
-        "TODOAPP_SA_PASSWORD": generate_password(),
-        "TODOAPP_DATABASE_PASSWORD": generate_password(),
+        "SSO_SA_PASSWORD": generate_password(),
+        "SSO_DATABASE_PASSWORD": generate_password(),
     }
     sys.exit(run_playbook("database.yml", args, secrets=secrets))

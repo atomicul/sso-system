@@ -3,7 +3,7 @@
 import os
 import sys
 
-from todoapp_deploy.runner import add_release_argument, argument_parser, run_playbook
+from sso_deploy.runner import add_release_argument, argument_parser, run_playbook
 
 
 def main() -> None:
@@ -21,8 +21,8 @@ def main() -> None:
     )
     args = parser.parse_args()
     variables = {
-        "todoapp_change_database_password": args.change_database_password,
-        "todoapp_change_certificate": args.change_certificate,
-        "todoapp_controller_directory": os.getcwd(),
+        "sso_change_database_password": args.change_database_password,
+        "sso_change_certificate": args.change_certificate,
+        "sso_controller_directory": os.getcwd(),
     }
     sys.exit(run_playbook("webapp.yml", args, variables=variables))

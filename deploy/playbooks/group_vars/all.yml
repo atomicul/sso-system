@@ -20,32 +20,32 @@ dotnet_root: /opt/dotnet/{{ dotnet_runtime_version }}
 mssql_edition: Express
 mssql_port: 1433
 
-todoapp_config_dir: /etc/todoapp
-todoapp_install_dir: /opt/todoapp
-todoapp_port: 80
-todoapp_https_port: 443
-todoapp_acme_webroot: /var/lib/todoapp/acme
-todoapp_tls_dir: "{{ todoapp_config_dir }}/tls"
-todoapp_database: Sso
-todoapp_database_login: todoapp
+sso_config_dir: /etc/sso
+sso_install_dir: /opt/sso
+sso_port: 80
+sso_https_port: 443
+sso_acme_webroot: /var/lib/sso/acme
+sso_tls_dir: "{{ sso_config_dir }}/tls"
+sso_database: Sso
+sso_database_login: sso
 
-todoapp_settings:
+sso_settings:
   Kestrel:
     Endpoints:
       Http:
-        Url: http://*:{{ todoapp_port }}
+        Url: http://*:{{ sso_port }}
   DataProtection:
     Certificate:
-      Path: "{{ todoapp_config_dir }}/dataprotection.pfx"
+      Path: "{{ sso_config_dir }}/dataprotection.pfx"
   AcmeChallenge:
-    WebRoot: "{{ todoapp_acme_webroot }}"
+    WebRoot: "{{ sso_acme_webroot }}"
 
-# Added to todoapp_settings once the host has a certificate in todoapp_tls_dir, which setup-tls puts there.
-todoapp_https_settings:
+# Added to sso_settings once the host has a certificate in sso_tls_dir, which setup-tls puts there.
+sso_https_settings:
   Kestrel:
     Endpoints:
       Https:
-        Url: https://*:{{ todoapp_https_port }}
+        Url: https://*:{{ sso_https_port }}
         Certificate:
-          Path: "{{ todoapp_tls_dir }}/fullchain.pem"
-          KeyPath: "{{ todoapp_tls_dir }}/privkey.pem"
+          Path: "{{ sso_tls_dir }}/fullchain.pem"
+          KeyPath: "{{ sso_tls_dir }}/privkey.pem"

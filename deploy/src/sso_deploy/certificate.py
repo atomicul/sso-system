@@ -13,8 +13,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import BestAvailableEncryption, pkcs12
 from cryptography.x509.oid import NameOID
 
-PASSWORD_VARIABLE = "TODOAPP_CERTIFICATE_PASSWORD"
-COMMON_NAME = "todoapp-dataprotection"
+PASSWORD_VARIABLE = "SSO_CERTIFICATE_PASSWORD"
+COMMON_NAME = "sso-dataprotection"
 VALIDITY = timedelta(days=3650)
 
 

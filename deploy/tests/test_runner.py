@@ -2,7 +2,7 @@ import argparse
 
 import pytest
 
-from todoapp_deploy.runner import (
+from sso_deploy.runner import (
     Target,
     parse_github_repository,
     parse_target,

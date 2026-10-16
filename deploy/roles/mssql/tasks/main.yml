@@ -30,23 +30,23 @@
 
 - name: Create the app's configuration directory
   ansible.builtin.file:
-    path: "{{ todoapp_config_dir }}"
+    path: "{{ sso_config_dir }}"
     state: directory
     mode: "0755"
 
 - name: Keep the generated sa password on the host, for later migrations
   ansible.builtin.template:
     src: database-admin.env.j2
-    dest: "{{ todoapp_config_dir }}/database-admin.env"
+    dest: "{{ sso_config_dir }}/database-admin.env"
     force: false
     mode: "0600"
   vars:
-    mssql_generated_sa_password: "{{ lookup('ansible.builtin.env', 'TODOAPP_SA_PASSWORD') }}"
+    mssql_generated_sa_password: "{{ lookup('ansible.builtin.env', 'SSO_SA_PASSWORD') }}"
   no_log: true
 
 - name: Read the sa password
   ansible.builtin.slurp:
-    src: "{{ todoapp_config_dir }}/database-admin.env"
+    src: "{{ sso_config_dir }}/database-admin.env"
   register: mssql_admin_env
   no_log: true
 

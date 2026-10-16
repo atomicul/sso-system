@@ -8,7 +8,7 @@
   tasks:
     - name: Serve HTTPS with the certificate
       ansible.builtin.include_role:
-        name: todoapp
+        name: sso
         tasks_from: settings.yml
 
     - name: Restart the app if its settings changed
@@ -16,5 +16,5 @@
 
     - name: Wait until the app is healthy over HTTPS
       ansible.builtin.include_role:
-        name: todoapp
+        name: sso
         tasks_from: health.yml
