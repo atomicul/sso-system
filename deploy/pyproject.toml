@@ -11,6 +11,7 @@ dependencies = [
 
 [project.scripts]
 generate-certificate = "sso_deploy.certificate:main"
+generate-key-pair = "sso_deploy.key_pair:main"
 setup-database = "sso_deploy.database:main"
 setup-webapp = "sso_deploy.webapp:main"
 setup-tls = "sso_deploy.tls:main"

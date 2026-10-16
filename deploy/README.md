@@ -82,6 +82,11 @@ it's served.
 `uv run generate-certificate dataprotection.pfx` writes a self-signed certificate that `setup-webapp` accepts, after
 asking for its password. It refuses to overwrite a file.
 
+### `generate-key-pair`
+
+`uv run generate-key-pair key.pem` writes an RSA private key to `key.pem`, which only you can read, and its public key
+to `key.pub.pem`, both as PEM. It refuses to overwrite either file.
+
 ## On the host
 
 | Path | Holds |
