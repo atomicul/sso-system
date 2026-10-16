@@ -67,8 +67,10 @@
     "logOut": "Log out",
     "emailAndPassword": "Email and password"
   },
-  "home": {
-    "signedIn": "You are signed in."
+  "apps": {
+    "title": "Your apps",
+    "loading": "Loading apps…",
+    "empty": "No apps are set up yet."
   },
   "notFound": {
     "title": "Page not found",

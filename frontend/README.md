@@ -206,17 +206,17 @@ The query cache is the one place a page's data lives. A route's `loader` only fi
 data rather than a loading state, and the page's components read the data back through the generated query hooks:
 
 ```tsx
-export const Route = createFileRoute('/_authenticated/account')({
+export const Route = createFileRoute('/_authenticated/')({
   loader: ({ context }) =>
     context.queryClient.query({
-      ...getGetPendingEmailQueryOptions(),
+      ...getGetApiAppsQueryOptions(),
       staleTime: 'static',
     }),
-  component: AccountPage,
+  component: AppsPage,
 })
 
-export function EmailForm() {
-  const { data: pending } = useGetPendingEmail()
+export function AppList() {
+  const { data: apps, isPending, error } = useGetApiApps()
   // ...
 }
 ```

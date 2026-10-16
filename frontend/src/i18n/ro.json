@@ -68,8 +68,10 @@
     "logOut": "Deconectează-te",
     "emailAndPassword": "Email și parolă"
   },
-  "home": {
-    "signedIn": "Ești autentificat."
+  "apps": {
+    "title": "Aplicațiile tale",
+    "loading": "Se încarcă aplicațiile…",
+    "empty": "Nicio aplicație nu este configurată încă."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
