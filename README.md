@@ -1,7 +1,6 @@
-# Example Web App
-This sample is in active development ;D
+# SSO
 
-A per-user todo app: an ASP.NET Core minimal API with Identity, and a React single-page app.
+A single sign-on portal for proprietary apps: an ASP.NET Core minimal API with Identity, and a React single-page app.
 
 ## Layout
 
@@ -12,7 +11,7 @@ A per-user todo app: an ASP.NET Core minimal API with Identity, and a React sing
 | `deploy/` | Ansible playbooks and the uv scripts that run them, to set the app and its database up on an Ubuntu host |
 | `Makefile` | Wires the projects together; none of them refers to another |
 
-Every API route lives under `/api` (`/api/auth/*`, `/api/todos`). The one exception is `GET /health`, which answers
+Every API route lives under `/api` (`/api/auth/*`). The one exception is `GET /health`, which answers
 `Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and `make dev`; it
 is not rate limited.
 
@@ -35,8 +34,8 @@ the `Dockerfile` together, then run `make api` and commit the regenerated client
 | `make help` | Lists the targets; also what a bare `make` runs |
 | `make install` | Restores the .NET solution and tools (`dotnet-ef`), installs the frontend packages, and syncs `deploy/` with uv |
 | `make dev` | Runs the database, the API on `:5080` with `dotnet watch` once the database is up, and the Vite dev server on `:5173` once the API answers `/health`; Vite proxies `/api` to the API |
-| `make dev-database` | Runs SQL Server in Docker on `:1433`, keeping its data in the `todoapp-db-data` volume |
-| `make reset-dev-database` | Deletes the `todoapp-db-data` volume, so the next run starts from an empty, freshly migrated database |
+| `make dev-database` | Runs SQL Server in Docker on `:1433`, keeping its data in the `sso-db-data` volume |
+| `make reset-dev-database` | Deletes the `sso-db-data` volume, so the next run starts from an empty, freshly migrated database |
 | `make migration NAME=AddTags` | Adds an EF Core migration to `backend/Sso.Server/Data/Migrations` after a model change |
 | `make api` | Builds the API, copies its OpenAPI document to `frontend/openapi.json` and regenerates the frontend client |
 | `make build` | Publishes the API to `out/` with the built SPA in `out/wwwroot`; `VERSION=1.2.3` stamps the API assembly version |
@@ -49,7 +48,7 @@ Run `make api` after changing an endpoint or contract, and commit the regenerate
 
 `Sso.Server.Tests` boots the whole API with `WebApplicationFactory` against SQL Server in a Docker container that
 Testcontainers starts and removes for each run, so the tests also apply the real migrations. Every test registers its
-own user, and all data belongs to a user, so tests share the database without resetting it. Identity's emails are
+own user, so tests share the database without resetting it. Identity's emails are
 captured instead of logged, which lets tests follow confirmation links. The tests of what the API sends through Dapr
 run a Dapr sidecar in another container, whose `bindings.localstorage` bindings write every message they get to a
 temporary directory for the tests to read. Run them alone with `dotnet test --solution backend/Sso.Server.slnx`.
@@ -196,7 +195,7 @@ list items take their index as the last level. Both commands read the same setti
 
 | Variable | Default | Sets |
 |---|---|---|
-| `ConnectionStrings__Default` | _required_ | The SQL Server connection string, e.g. `Server=db;Database=TodoApp;User Id=todo;Password=...;TrustServerCertificate=True` |
+| `ConnectionStrings__Default` | _required_ | The SQL Server connection string, e.g. `Server=db;Database=Sso;User Id=sso;Password=...;TrustServerCertificate=True` |
 | `SpaUrl` | the API's own origin | The origin of links in emails |
 | `DataProtection__Certificate__Path` | none | A PFX certificate that encrypts the keys protecting sessions, e.g. mounted read-only and readable by the container's non-root user |
 | `DataProtection__Certificate__Password` | none | The password of that PFX file |

@@ -12,7 +12,7 @@ export function NotFound() {
           The page you are looking for does not exist or has moved.
         </p>
         <Link to="/" className={buttonVariants({ className: 'mt-2' })}>
-          Back to your todos
+          Back to your apps
         </Link>
       </div>
     </main>

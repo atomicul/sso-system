@@ -22,7 +22,7 @@ function AuthenticatedLayout() {
     <div className="min-h-svh">
       <header className="border-b">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 p-4">
-          <span className="font-heading font-semibold">Todos</span>
+          <span className="font-heading font-semibold">SSO</span>
           <div className="flex items-center gap-3">
             <span className="text-muted-foreground truncate text-sm">
               {user.email}

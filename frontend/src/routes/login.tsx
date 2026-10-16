@@ -56,7 +56,7 @@ function LoginPage() {
   return (
     <AuthCard
       title="Log in"
-      description="Welcome back! Log in to see your todos."
+      description="Welcome back! Log in to open your apps."
       footer={
         <p>
           New here?{' '}

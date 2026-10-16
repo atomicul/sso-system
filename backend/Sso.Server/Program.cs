@@ -5,14 +5,12 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Sso.Server;
 using Sso.Server.Auth;
-using Sso.Server.Todos;
 using Sso.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var appName = builder.Configuration["AppName"] ?? builder.Environment.ApplicationName;
 var isGeneratingOpenApiDocument = Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider";
 
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 if (!isGeneratingOpenApiDocument)
 {
@@ -83,7 +81,6 @@ app.MapAcmeChallenge();
 
 var api = app.MapGroup("/api").RequireRateLimiting(RateLimits.Api);
 api.MapAuth();
-api.MapTodos();
 api.MapFallback(() => TypedResults.NotFound());
 app.MapFallbackToFile("index.html");
 

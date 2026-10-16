@@ -44,7 +44,7 @@ function RegisterPage() {
   return (
     <AuthCard
       title="Create an account"
-      description="Sign up to start keeping track of your todos."
+      description="Sign up to get access to your apps."
       footer={
         <p>
           Already have an account?{' '}
