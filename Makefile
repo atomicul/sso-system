@@ -10,7 +10,7 @@ DB_PASSWORD ?= Dev-Passw0rd
 DB_CONNECTION ?= Server=localhost,$(DB_PORT);Database=Sso;User Id=sa;Password=$(DB_PASSWORD);TrustServerCertificate=True
 DEV_KEYS ?= $(CURDIR)/.dev/keys
 
-SOLUTION := backend/Sso.Server.slnx
+SOLUTIONS := backend/Sso.Server.slnx client_library/Sso.Client.slnx
 API_PROJECT := backend/Sso.Server
 FRONTEND := frontend
 DEPLOY := deploy
@@ -22,8 +22,8 @@ DEPLOY := deploy
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-install: ## Restore the .NET solution and tools and install the frontend and deploy packages
-	dotnet restore $(SOLUTION)
+install: ## Restore the .NET solutions and tools and install the frontend and deploy packages
+	for solution in $(SOLUTIONS); do dotnet restore $$solution || exit 1; done
 	dotnet tool restore
 	pnpm -C $(FRONTEND) install
 	uv --directory $(DEPLOY) sync --locked
@@ -80,10 +80,10 @@ run: build dev-keys ## Build, then serve the API and the SPA together
 		dotnet Sso.Server.dll --urls $(API_URL)
 
 check: ## Run formatting, build, pending migration, lint, type checks and tests of every project
-	dotnet format $(SOLUTION) --verify-no-changes
-	dotnet build $(SOLUTION)
+	for solution in $(SOLUTIONS); do dotnet format $$solution --verify-no-changes || exit 1; done
+	for solution in $(SOLUTIONS); do dotnet build $$solution || exit 1; done
 	dotnet ef migrations has-pending-model-changes --project $(API_PROJECT)
-	dotnet test --solution $(SOLUTION)
+	for solution in $(SOLUTIONS); do dotnet test --solution $$solution || exit 1; done
 	pnpm -C $(FRONTEND) lint
 	pnpm -C $(FRONTEND) format:check
 	pnpm -C $(FRONTEND) typecheck
@@ -94,5 +94,5 @@ check: ## Run formatting, build, pending migration, lint, type checks and tests 
 	uv --directory $(DEPLOY) run ansible-lint
 	uv --directory $(DEPLOY) run ansible-playbook --syntax-check --inventory localhost, playbooks/database.yml playbooks/webapp.yml playbooks/tls.yml
 
-clean: ## Remove build output, including the backend bin and obj directories
-	rm -rf $(OUT) $(FRONTEND)/dist backend/*/bin backend/*/obj
+clean: ## Remove build output, including the bin and obj directories of the .NET projects
+	rm -rf $(OUT) $(FRONTEND)/dist $(foreach solution,$(SOLUTIONS),$(dir $(solution))*/bin $(dir $(solution))*/obj)
