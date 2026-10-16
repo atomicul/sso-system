@@ -9,7 +9,7 @@ namespace Sso.Server.Tests;
 /// </summary>
 public class HttpsTests(SsoServerFactory factory)
 {
-    private const string Host = "todo.test";
+    private const string Host = "sso.test";
 
     [Fact]
     public async Task Http_redirects_to_https_when_kestrel_serves_https()

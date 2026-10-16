@@ -1,0 +1,5 @@
+{% set settings = sso_settings %}
+{% if sso_https_certificate.stat.exists %}
+{% set settings = settings | ansible.builtin.combine(sso_https_settings, recursive=True) %}
+{% endif %}
+{{ settings | ansible.builtin.to_nice_json(indent=2) }}

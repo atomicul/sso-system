@@ -1,6 +1,6 @@
 import pytest
 
-from todoapp_deploy.passwords import ALPHABET, generate_password, meets_sql_server_policy
+from sso_deploy.passwords import ALPHABET, generate_password, meets_sql_server_policy
 
 
 def test_generate_password_meets_the_policy_with_only_letters_and_digits():

@@ -134,7 +134,7 @@ The app serves HTTPS itself when Kestrel has an `Https` endpoint, e.g. in `appse
     "Http": { "Url": "http://*:80" },
     "Https": {
       "Url": "https://*:443",
-      "Certificate": { "Path": "/etc/todoapp/tls/fullchain.pem", "KeyPath": "/etc/todoapp/tls/privkey.pem" }
+      "Certificate": { "Path": "/etc/sso/tls/fullchain.pem", "KeyPath": "/etc/sso/tls/privkey.pem" }
     }
   }
 }
@@ -154,7 +154,7 @@ to HTTPS too, which Let's Encrypt follows.
 
 Every semver tag on `main` publishes `ghcr.io/OWNER/REPO`, where `OWNER/REPO` is this repository, tagged with the
 version (`1.2.3`) and, for stable releases, `1.2`, `1` and `latest`. GitHub shows this README on the image's package
-page. Build the same image locally with `docker build -t todoapp .`.
+page. Build the same image locally with `docker build -t sso .`.
 
 The image runs the API and serves the SPA on port `8080` as a non-root user, in the Production environment.
 `GET /health` answers `Healthy` once it is up and can reach the database. It runs one of two commands:

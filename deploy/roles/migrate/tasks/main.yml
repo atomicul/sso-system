@@ -6,7 +6,7 @@
       - run
       - --rm
       - --network=host
-      - --env-file={{ todoapp_config_dir }}/database-admin.env
+      - --env-file={{ sso_config_dir }}/database-admin.env
       - ghcr.io/{{ image_repository }}:{{ app_version }}
       - migrate
   register: migrate_result

@@ -3,7 +3,7 @@ import stat
 import pytest
 from cryptography.hazmat.primitives.serialization import pkcs12
 
-from todoapp_deploy.certificate import COMMON_NAME, generate
+from sso_deploy.certificate import COMMON_NAME, generate
 
 
 def test_generate_writes_a_pfx_that_opens_with_its_password(tmp_path):
