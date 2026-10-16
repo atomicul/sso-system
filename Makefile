@@ -9,8 +9,8 @@ DB_PORT ?= 1433
 DB_PASSWORD ?= Dev-Passw0rd
 DB_CONNECTION ?= Server=localhost,$(DB_PORT);Database=TodoApp;User Id=sa;Password=$(DB_PASSWORD);TrustServerCertificate=True
 
-SOLUTION := backend/TodoApp.slnx
-API_PROJECT := backend/TodoApi
+SOLUTION := backend/Sso.Server.slnx
+API_PROJECT := backend/Sso.Server
 FRONTEND := frontend
 DEPLOY := deploy
 
@@ -70,7 +70,7 @@ build: ## Publish the API to out/ with the built SPA in out/wwwroot
 	cp -R $(FRONTEND)/dist/. $(OUT)/wwwroot/
 
 run: build ## Build, then serve the API and the SPA together
-	cd $(OUT) && ConnectionStrings__Default="$(DB_CONNECTION)" dotnet TodoApi.dll --urls $(API_URL)
+	cd $(OUT) && ConnectionStrings__Default="$(DB_CONNECTION)" dotnet Sso.Server.dll --urls $(API_URL)
 
 check: ## Run formatting, build, pending migration, lint, type checks and tests of every project
 	dotnet format $(SOLUTION) --verify-no-changes

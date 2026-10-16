@@ -1,6 +1,6 @@
 # Backend
 
-The .NET solution: `TodoApi`, the ASP.NET Core minimal API, and `TodoApi.Tests`, its integration tests. The
+The .NET solution: `Sso.Server`, the ASP.NET Core minimal API, and `Sso.Server.Tests`, its integration tests. The
 [root README](../README.md) covers running, configuring and deploying the app; this one covers the code patterns to
 follow when changing the API.
 
@@ -110,12 +110,12 @@ uses one looks like the emails:
 
 ## Tests
 
-`TodoApi.Tests` boots the whole API with `WebApplicationFactory` against SQL Server in a Docker container that
+`Sso.Server.Tests` boots the whole API with `WebApplicationFactory` against SQL Server in a Docker container that
 Testcontainers starts and removes for each run, so the tests also apply the real migrations. Every test registers its
 own user, and all data belongs to a user, so tests share the database without resetting it. Identity's emails are
 captured instead of logged, which lets tests follow confirmation links. The tests of what the API sends through Dapr
 run a Dapr sidecar in another container, whose `bindings.localstorage` bindings write every message they get to a
-temporary directory for the tests to read. Run them alone with `dotnet test --solution backend/TodoApp.slnx`.
+temporary directory for the tests to read. Run them alone with `dotnet test --solution backend/Sso.Server.slnx`.
 
 Tests act as a client would, through the helpers in `TestUsers` and `TodoClient`. A refused request is read with
 `ReadValidationProblemAsync`, which asserts the 400 and returns both the problem as ASP.NET's clients read it and its
