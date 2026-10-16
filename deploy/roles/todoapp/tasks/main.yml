@@ -32,7 +32,7 @@
     src: "{{ todoapp_install_dir }}/releases/{{ release_tag }}.zip"
     dest: "{{ todoapp_install_dir }}/releases/{{ release_tag }}"
     remote_src: true
-    creates: "{{ todoapp_install_dir }}/releases/{{ release_tag }}/TodoApi.dll"
+    creates: "{{ todoapp_install_dir }}/releases/{{ release_tag }}/Sso.Server.dll"
 
 - name: Write the app's settings
   ansible.builtin.include_tasks: settings.yml
