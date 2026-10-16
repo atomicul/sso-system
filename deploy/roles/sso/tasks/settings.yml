@@ -4,7 +4,30 @@
     path: "{{ sso_tls_dir }}/fullchain.pem"
   register: sso_https_certificate
 
-- name: Write the app's settings, serving HTTPS when the host has a certificate
+- name: Look for the client apps on the host
+  ansible.builtin.stat:
+    path: "{{ sso_client_apps_dir }}/apps.json"
+  register: sso_client_apps_file
+
+- name: Read the client apps on the host
+  ansible.builtin.slurp:
+    src: "{{ sso_client_apps_dir }}/apps.json"
+  register: sso_client_apps_json
+  when: sso_client_apps_file.stat.exists
+
+- name: Point each client app at its public key on the host
+  ansible.builtin.set_fact:
+    sso_client_apps_settings: >-
+      {{ sso_client_apps_settings | ansible.builtin.combine(
+           {'ClientApps': {item.key: item.value | ansible.builtin.combine(
+             {'PublicKeyPath': sso_client_apps_dir ~ '/' ~ item.key ~ '.pub.pem'})}},
+           recursive=True) }}
+  loop: "{{ sso_client_apps_json.content | ansible.builtin.b64decode | ansible.builtin.from_json | ansible.builtin.dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: sso_client_apps_file.stat.exists
+
+- name: Write the app's settings, serving HTTPS when the host has a certificate and listing its client apps
   ansible.builtin.template:
     src: appsettings.Production.json.j2
     dest: "{{ sso_config_dir }}/appsettings.Production.json"

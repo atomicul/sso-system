@@ -1,9 +1,18 @@
 """setup-webapp: installs a release of the app on a host as a systemd service."""
 
+import argparse
 import os
 import sys
+from pathlib import Path
 
 from sso_deploy.runner import add_release_argument, argument_parser, run_playbook
+
+
+def parse_client_apps_directory(value: str) -> Path:
+    path = Path(value).expanduser()
+    if not (path / "apps.json").is_file():
+        raise argparse.ArgumentTypeError(f"expected a directory with the client apps' apps.json, got {value!r}")
+    return path.resolve()
 
 
 def main() -> None:
@@ -24,11 +33,17 @@ def main() -> None:
         action="store_true",
         help="replace the key the SSO signs its tokens with, which client apps reject until they have its public key",
     )
+    parser.add_argument(
+        "--client-apps",
+        type=parse_client_apps_directory,
+        help="replace the host's client apps with the apps.json, public keys and icons of this directory",
+    )
     args = parser.parse_args()
     variables = {
         "sso_change_database_password": args.change_database_password,
         "sso_change_certificate": args.change_certificate,
         "sso_change_signing_key": args.change_signing_key,
+        "sso_client_apps_source": str(args.client_apps or ""),
         "sso_controller_directory": os.getcwd(),
     }
     sys.exit(run_playbook("webapp.yml", args, variables=variables))

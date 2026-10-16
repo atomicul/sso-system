@@ -51,3 +51,10 @@ sso_https_settings:
         Certificate:
           Path: "{{ sso_tls_dir }}/fullchain.pem"
           KeyPath: "{{ sso_tls_dir }}/privkey.pem"
+
+# Added to sso_settings once the host has apps.json in sso_client_apps_dir, which setup-webapp --client-apps puts
+# there, with each app's PublicKeyPath pointing at its <key>.pub.pem beside it.
+sso_client_apps_dir: "{{ sso_config_dir }}/apps"
+sso_client_apps_settings:
+  AppIcons:
+    Directory: "{{ sso_client_apps_dir }}"
