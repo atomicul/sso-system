@@ -18,11 +18,21 @@ public static class TestUsers
     public static async Task<HttpClient> CreateUserClientAsync(this SsoServerFactory factory)
     {
         var client = factory.CreateClient();
+        await client.AuthorizeAsNewUserAsync(factory);
+        return client;
+    }
+
+    /// <summary>
+    /// Authorizes the client, which may come from a server with other settings, with the bearer token of a new,
+    /// confirmed user, returning the user's email.
+    /// </summary>
+    public static async Task<string> AuthorizeAsNewUserAsync(this HttpClient client, SsoServerFactory factory)
+    {
         var email = await client.RegisterConfirmedAsync(factory);
         var login = await client.LoginAsync(email);
         var token = await login.EnsureSuccessStatusCode().Content.ReadFromJsonAsync<AccessTokenResponse>(CancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token!.AccessToken);
-        return client;
+        return email;
     }
 
     /// <summary>Registers a new user and confirms their email with the link the API sent, returning the email.</summary>

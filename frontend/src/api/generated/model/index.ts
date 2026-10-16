@@ -7,6 +7,7 @@
  */
 
 export * from './accessTokenResponse';
+export * from './appResponse';
 export * from './forgotPasswordRequest';
 export * from './httpValidationProblemDetails';
 export * from './httpValidationProblemDetailsErrors';

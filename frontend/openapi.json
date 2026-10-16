@@ -459,6 +459,99 @@
           }
         ]
       }
+    },
+    "/api/apps": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Lists the apps the user can open.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/apps/{key}/icon": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Serves the app's icon.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/apps/{key}/launch": {
+      "get": {
+        "tags": [
+          "Apps"
+        ],
+        "summary": "Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to\nthe app once, within a minute.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -488,6 +581,29 @@
             "type": "string"
           }
         }
+      },
+      "AppResponse": {
+        "required": [
+          "key",
+          "name",
+          "iconUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "An app the user can open, with the URL of its icon, or null when it has none."
       },
       "ForgotPasswordRequest": {
         "required": [
@@ -788,6 +904,9 @@
   "tags": [
     {
       "name": "Auth"
+    },
+    {
+      "name": "Apps"
     }
   ]
 }

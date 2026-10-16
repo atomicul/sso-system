@@ -11,7 +11,7 @@ A single sign-on portal for proprietary apps: an ASP.NET Core minimal API with I
 | `deploy/` | Ansible playbooks and the uv scripts that run them, to set the app and its database up on an Ubuntu host |
 | `Makefile` | Wires the projects together; none of them refers to another |
 
-Every API route lives under `/api` (`/api/auth/*`). The one exception is `GET /health`, which answers
+Every API route lives under `/api` (`/api/auth/*`, `/api/apps`). The one exception is `GET /health`, which answers
 `Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and `make dev`; it
 is not rate limited.
 
@@ -35,6 +35,7 @@ the `Dockerfile` together, then run `make api` and commit the regenerated client
 | `make install` | Restores the .NET solution and tools (`dotnet-ef`), installs the frontend packages, and syncs `deploy/` with uv |
 | `make dev` | Runs the database, the API on `:5080` with `dotnet watch` once the database is up, and the Vite dev server on `:5173` once the API answers `/health`; Vite proxies `/api` to the API |
 | `make dev-database` | Runs SQL Server in Docker on `:1433`, keeping its data in the `sso-db-data` volume |
+| `make dev-keys` | Generates the development key pairs in `.dev/keys` (`DEV_KEYS`), unless they exist; `make dev` and `make run` sign tokens with `sso.pem` |
 | `make reset-dev-database` | Deletes the `sso-db-data` volume, so the next run starts from an empty, freshly migrated database |
 | `make migration NAME=AddTags` | Adds an EF Core migration to `backend/Sso.Server/Data/Migrations` after a model change |
 | `make api` | Builds the API, copies its OpenAPI document to `frontend/openapi.json` and regenerates the frontend client |
@@ -95,6 +96,36 @@ anyone who can read the database can forge sessions; restrict access to it accor
 `DataProtection:Certificate:Path` to a PFX file, and `DataProtection:Certificate:Password` to its password, encrypts
 every new key with that certificate. Keys created before stay readable without it until they expire after 90 days.
 Replacing or removing the certificate makes the keys it encrypted unreadable, which logs every user out.
+
+## Client apps
+
+The portal lists the apps configured under `ClientApps` and logs users in to them. Each app has a key of lowercase
+letters, digits and dashes, which names it in URLs and in its icon's file name:
+
+```json
+"ClientApps": {
+  "billing": {
+    "Name": "Billing",
+    "Endpoint": "https://billing.example.com/sso",
+    "PublicKeyPath": "/etc/sso/apps/billing.pub.pem"
+  }
+}
+```
+
+- `GET /api/apps` lists the apps as `{ key, name, iconUrl }`. `iconUrl` is `/api/apps/<key>/icon` when
+  `AppIcons:Directory` has a `<key>.jpg`, `<key>.png` or `<key>.webp` file, and `null` otherwise.
+- `GET /api/apps/<key>/launch` redirects the user to the app's `Endpoint` with a `token` query parameter, which the
+  app's `Sso.Client` library turns into a session.
+
+The token is a JWT signed (RS256) with the SSO's private key at `SigningKey:Path`, then encrypted (RSA-OAEP with
+A256CBC-HS512) with the app's public key, so only that app can read it and only the SSO can have written it. It holds
+the user's id (`sub`) and `email`, expires after a minute, and its `jti` is the next value of the database's
+`LaunchTokenNumbers` sequence. Those numbers only grow, so an app accepts each token once by rejecting any that isn't
+newer than the last it accepted for the user. Restoring the database from a backup sets the sequence back, and apps
+then reject that user's logins until the numbers catch up.
+
+The API refuses to start without a signing key, with an invalid app, or with two apps that share a public key.
+`uv run generate-key-pair` in `deploy/` writes a key pair (see [deploy/README.md](deploy/README.md)).
 
 ## Translations
 
@@ -161,7 +192,7 @@ The image runs the API and serves the SPA on port `8080` as a non-root user, in 
 
 | Command | Does |
 |---|---|
-| _(default)_ | Serves the app: `docker run -p 8080:8080 -e ConnectionStrings__Default=... ghcr.io/OWNER/REPO:1.2.3` |
+| _(default)_ | Serves the app: `docker run -p 8080:8080 -e ConnectionStrings__Default=... -e SigningKey__Path=... ghcr.io/OWNER/REPO:1.2.3` |
 | `migrate` | Applies pending migrations to the database and exits: `docker run --rm -e ConnectionStrings__Default=... ghcr.io/OWNER/REPO:1.2.3 migrate` |
 
 ### Environment variables
@@ -175,6 +206,9 @@ list items take their index as the last level. Both commands read the same setti
 | `SpaUrl` | the API's own origin | The origin of links in emails |
 | `DataProtection__Certificate__Path` | none | A PFX certificate that encrypts the keys protecting sessions, e.g. mounted read-only and readable by the container's non-root user |
 | `DataProtection__Certificate__Password` | none | The password of that PFX file |
+| `SigningKey__Path` | _required_ | The PEM RSA private key the SSO signs its tokens with (see [Client apps](#client-apps)), e.g. mounted read-only |
+| `ClientApps__<key>__Name`, `…__Endpoint`, `…__PublicKeyPath` | none | An app users open from the portal: its name, the URL that receives its tokens, and its PEM public key |
+| `AppIcons__Directory` | none | The directory of the apps' icons, `<key>.jpg`, `<key>.png` or `<key>.webp` |
 | `TrustedProxies__Addresses__0`, `__1`, ... | none | IP addresses of reverse proxies whose `X-Forwarded-For` and `X-Forwarded-Proto` are trusted |
 | `TrustedProxies__Networks__0`, `__1`, ... | none | CIDR ranges of trusted reverse proxies, e.g. `172.16.0.0/12` |
 | `Kestrel__Endpoints__Https__Url` | none | An HTTPS address to listen on, e.g. `https://*:8443`, which also redirects HTTP to HTTPS (see [HTTPS](#https)) |
