@@ -4,5 +4,9 @@
 **/dist
 **/TestResults
 out
+packages
+client_library
+demo
+.dev
 .git
 .github

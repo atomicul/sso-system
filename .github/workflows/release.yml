@@ -28,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     env:
       ARCHIVE: ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
     steps:
@@ -70,7 +71,13 @@ jobs:
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then
             flags+=(--prerelease)
           fi
-          gh release create "$GITHUB_REF_NAME" "$ARCHIVE" "${flags[@]}"
+          gh release create "$GITHUB_REF_NAME" "$ARCHIVE" packages/*.nupkg "${flags[@]}"
+
+      - name: Publish the client library to GitHub Packages
+        run: >-
+          dotnet nuget push "packages/*.nupkg"
+          --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          --api-key "${{ github.token }}"
 
   image:
     needs: check

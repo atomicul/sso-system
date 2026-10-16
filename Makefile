@@ -2,6 +2,7 @@ API_URL ?= http://localhost:5080
 SPA_URL ?= http://localhost:5173
 DEMO_URL ?= http://localhost:5090
 OUT ?= out
+PACKAGES ?= packages
 VERSION ?=
 DB_IMAGE ?= mcr.microsoft.com/mssql/server:2025-latest
 DB_CONTAINER ?= sso-db
@@ -15,6 +16,7 @@ DEV_KEYS ?= $(CURDIR)/.dev/keys
 TESTED_SOLUTIONS := backend/Sso.Server.slnx client_library/Sso.Client.slnx
 SOLUTIONS := $(TESTED_SOLUTIONS) demo/Sso.Demo.slnx
 API_PROJECT := backend/Sso.Server
+CLIENT_LIBRARY := client_library/Sso.Client
 DEMO_PROJECT := demo/Sso.Demo
 PROJECT ?= $(API_PROJECT)
 FRONTEND := frontend
@@ -81,9 +83,10 @@ api: ## Regenerate the frontend client from the API OpenAPI document
 	cp $(API_PROJECT)/obj/openapi.json $(FRONTEND)/openapi.json
 	pnpm -C $(FRONTEND) generate:api
 
-build: ## Publish the API to out/ with the built SPA in out/wwwroot
-	rm -rf $(OUT)
+build: ## Publish the API to out/ with the built SPA in out/wwwroot, and pack the client library into packages/
+	rm -rf $(OUT) $(PACKAGES)
 	dotnet publish $(API_PROJECT) -c Release -o $(OUT) $(if $(VERSION),-p:Version=$(VERSION))
+	dotnet pack $(CLIENT_LIBRARY) -c Release -o $(PACKAGES) $(if $(VERSION),-p:Version=$(VERSION))
 	pnpm -C $(FRONTEND) build
 	mkdir -p $(OUT)/wwwroot
 	cp -R $(FRONTEND)/dist/. $(OUT)/wwwroot/
@@ -109,4 +112,4 @@ check: ## Run formatting, build, pending migration, lint, type checks and tests 
 	uv --directory $(DEPLOY) run ansible-playbook --syntax-check --inventory localhost, playbooks/database.yml playbooks/webapp.yml playbooks/tls.yml
 
 clean: ## Remove build output, including the bin and obj directories of the .NET projects
-	rm -rf $(OUT) $(FRONTEND)/dist $(foreach solution,$(SOLUTIONS),$(dir $(solution))*/bin $(dir $(solution))*/obj)
+	rm -rf $(OUT) $(PACKAGES) $(FRONTEND)/dist $(foreach solution,$(SOLUTIONS),$(dir $(solution))*/bin $(dir $(solution))*/obj)
