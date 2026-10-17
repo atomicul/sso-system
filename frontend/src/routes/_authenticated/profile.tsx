@@ -13,12 +13,7 @@ function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-heading text-lg font-semibold">Your profile</h1>
-        <p className="text-muted-foreground text-sm">
-          Apps receive these details the next time you open them from here.
-        </p>
-      </div>
+      <h1 className="font-heading text-lg font-semibold">Your profile</h1>
       <ProfileForm profile={profile} />
     </div>
   )
