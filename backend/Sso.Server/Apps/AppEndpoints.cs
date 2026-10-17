@@ -39,7 +39,7 @@ public static class AppEndpoints
     public static async Task<Results<RedirectHttpResult, NotFound, UnauthorizedHttpResult>> Launch(
         string key,
         ClaimsPrincipal principal,
-        UserManager<IdentityUser> users,
+        UserManager<SsoUser> users,
         AppDbContext db,
         [FromServices] ClientAppCatalog catalog,
         [FromServices] LaunchTokens tokens,

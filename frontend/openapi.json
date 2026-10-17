@@ -497,6 +497,80 @@
           }
         ]
       }
+    },
+    "/api/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "The user's profile.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Replaces the user's profile. Apps receive the new profile the next time the user opens them from the portal.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token."
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -526,6 +600,54 @@
             "type": "string"
           }
         }
+      },
+      "Address": {
+        "required": [
+          "streetAddress",
+          "locality",
+          "region",
+          "postalCode",
+          "country"
+        ],
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "maxLength": 200,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "locality": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "region": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "maxLength": 20,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "country": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "A postal address, in the parts of the OpenID Connect `address` claim."
       },
       "AppResponse": {
         "required": [
@@ -671,6 +793,50 @@
           }
         }
       },
+      "Profile": {
+        "required": [
+          "givenName",
+          "familyName",
+          "birthdate",
+          "phoneNumber",
+          "address"
+        ],
+        "type": "object",
+        "properties": {
+          "givenName": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "familyName": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "birthdate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "phoneNumber": {
+            "maxLength": 30,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        },
+        "description": "The user's profile, which the SSO shares with the apps it logs them in to. Every field may be null, and blank ones\nare saved as null."
+      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -806,6 +972,9 @@
     },
     {
       "name": "Apps"
+    },
+    {
+      "name": "Profile"
     }
   ]
 }

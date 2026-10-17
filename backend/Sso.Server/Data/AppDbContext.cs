@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +6,7 @@ namespace Sso.Server.Data;
 
 /// <summary>Identity store, the Data Protection key ring, and the numbers of the tokens that log users in to apps.</summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options)
-    : IdentityDbContext<IdentityUser>(options), IDataProtectionKeyContext
+    : IdentityDbContext<SsoUser>(options), IDataProtectionKeyContext
 {
     private const string LaunchTokenNumbers = nameof(LaunchTokenNumbers);
     private const string NextLaunchTokenNumberSql = "SELECT NEXT VALUE FOR " + LaunchTokenNumbers + " AS [Value]";

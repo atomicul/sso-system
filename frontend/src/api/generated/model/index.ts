@@ -7,6 +7,7 @@
  */
 
 export * from './accessTokenResponse';
+export * from './address';
 export * from './appResponse';
 export * from './forgotPasswordRequest';
 export * from './httpValidationProblemDetails';
@@ -16,6 +17,7 @@ export * from './infoResponse';
 export * from './loginRequest';
 export * from './mapIdentityApiApiAuthConfirmEmailParams';
 export * from './postApiAuthLoginParams';
+export * from './profile';
 export * from './refreshRequest';
 export * from './registerRequest';
 export * from './resendConfirmationEmailRequest';

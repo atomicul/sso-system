@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity;
+using Sso.Server.Data;
 
 namespace Sso.Server;
 
@@ -11,21 +12,21 @@ namespace Sso.Server;
 /// Links reach the transport HTML-encoded, just as Identity hands them over.
 /// </summary>
 public class SpaLinkEmailSender(
-    [FromKeyedServices(SpaLinkEmailSender.TransportKey)] IEmailSender<IdentityUser> transport,
-    IConfiguration configuration) : IEmailSender<IdentityUser>
+    [FromKeyedServices(SpaLinkEmailSender.TransportKey)] IEmailSender<SsoUser> transport,
+    IConfiguration configuration) : IEmailSender<SsoUser>
 {
     /// <summary>The service key of the <see cref="IEmailSender{TUser}"/> that delivers the emails.</summary>
     public const string TransportKey = "transport";
 
     private const string ConfirmEmailPage = "/confirm-email";
 
-    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink) =>
+    public Task SendConfirmationLinkAsync(SsoUser user, string email, string confirmationLink) =>
         transport.SendConfirmationLinkAsync(user, email, ToConfirmEmailPage(confirmationLink));
 
-    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink) =>
+    public Task SendPasswordResetLinkAsync(SsoUser user, string email, string resetLink) =>
         transport.SendPasswordResetLinkAsync(user, email, resetLink);
 
-    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode) =>
+    public Task SendPasswordResetCodeAsync(SsoUser user, string email, string resetCode) =>
         transport.SendPasswordResetCodeAsync(user, email, resetCode);
 
     private string ToConfirmEmailPage(string confirmationLink)

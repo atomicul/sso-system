@@ -13,9 +13,9 @@ A single sign-on portal for proprietary apps: an ASP.NET Core minimal API with I
 | `deploy/` | Ansible playbooks and the uv scripts that run them, to set the app and its database up on an Ubuntu host |
 | `Makefile` | Wires the projects together; none of them refers to another |
 
-Every API route lives under `/api` (`/api/auth/*`, `/api/apps`). The one exception is `GET /health`, which answers
-`Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and `make dev`; it
-is not rate limited.
+Every API route lives under `/api` (`/api/auth/*`, `/api/apps`, `/api/profile`). The one exception is `GET /health`,
+which answers `Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and
+`make dev`; it is not rate limited.
 
 ## Requirements
 
@@ -90,6 +90,12 @@ anyone who can read the database can forge sessions; restrict access to it accor
 `DataProtection:Certificate:Path` to a PFX file, and `DataProtection:Certificate:Password` to its password, encrypts
 every new key with that certificate. Keys created before stay readable without it until they expire after 90 days.
 Replacing or removing the certificate makes the keys it encrypted unreadable, which logs every user out.
+
+## Profile
+
+Besides the email and password Identity keeps, each user has a profile: a given and a family name, a birthdate, a
+phone number and a postal address (street, locality, region, postal code and country). `GET /api/profile` reads it and
+`PUT /api/profile` replaces it; every field may be null, and blank values are saved as null.
 
 ## Client apps
 

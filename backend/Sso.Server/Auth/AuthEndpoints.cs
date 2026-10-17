@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Sso.Server.Data;
 
 namespace Sso.Server.Auth;
 
@@ -13,7 +14,7 @@ public static class AuthEndpoints
     {
         var auth = app.MapGroup("/auth").WithTags("Auth");
 
-        auth.MapIdentityApi<IdentityUser>().Add(LimitEmailSending);
+        auth.MapIdentityApi<SsoUser>().Add(LimitEmailSending);
         auth.MapPost("/logout", Logout).RequireAuthorization();
 
         return app;
@@ -34,7 +35,7 @@ public static class AuthEndpoints
     }
 
     /// <summary>Signs the current user out by clearing the Identity cookie.</summary>
-    public static async Task<Ok> Logout(SignInManager<IdentityUser> signInManager)
+    public static async Task<Ok> Logout(SignInManager<SsoUser> signInManager)
     {
         await signInManager.SignOutAsync();
         return TypedResults.Ok();

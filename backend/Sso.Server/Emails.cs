@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Sso.Server.Data;
 
 namespace Sso.Server;
 
@@ -7,6 +8,6 @@ public static class Emails
 {
     public static IServiceCollection AddEmails(this IServiceCollection services) =>
         services
-            .AddKeyedTransient<IEmailSender<IdentityUser>, LoggingEmailSender>(SpaLinkEmailSender.TransportKey)
-            .AddTransient<IEmailSender<IdentityUser>, SpaLinkEmailSender>();
+            .AddKeyedTransient<IEmailSender<SsoUser>, LoggingEmailSender>(SpaLinkEmailSender.TransportKey)
+            .AddTransient<IEmailSender<SsoUser>, SpaLinkEmailSender>();
 }
