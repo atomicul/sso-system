@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Sso.Server.Apps;
+using Sso.Server.Profiles;
 
 namespace Sso.Server.Tests;
 
@@ -79,6 +80,42 @@ public class AppsTests(SsoServerFactory factory) : IDisposable
         Assert.Equal(email, token.Claims[JwtRegisteredClaimNames.Email]);
         Assert.False(string.IsNullOrEmpty((string)token.Claims[JwtRegisteredClaimNames.Sub]));
         Assert.InRange(token.SecurityToken.ValidTo, DateTime.UtcNow, DateTime.UtcNow + factory.Services.GetRequiredService<LaunchTokens>().Lifetime);
+    }
+
+    [Fact]
+    public async Task Launch_token_carries_the_users_profile()
+    {
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        await client.AuthorizeAsNewUserAsync(factory);
+        var profile = new Profile("Ada", "Lovelace", new DateOnly(1815, 12, 10), "+44 20 7946 0000",
+            new Address("12 St James's Square", "London", null, "SW1Y 4JH", "United Kingdom"));
+        (await client.PutAsJsonAsync("/api/profile", profile, CancellationToken)).EnsureSuccessStatusCode();
+
+        var response = await client.GetAsync($"/api/apps/{SsoServerFactory.AppKey}/launch", CancellationToken);
+        var token = (JsonWebToken)(await ReadTokenAsync(response, factory.AppKeyPair)).SecurityToken;
+
+        Assert.Equal("Ada", token.GetClaim(JwtRegisteredClaimNames.GivenName).Value);
+        Assert.Equal("Lovelace", token.GetClaim(JwtRegisteredClaimNames.FamilyName).Value);
+        Assert.Equal("1815-12-10", token.GetClaim(JwtRegisteredClaimNames.Birthdate).Value);
+        Assert.Equal("+44 20 7946 0000", token.GetClaim(JwtRegisteredClaimNames.PhoneNumber).Value);
+        Assert.Equal(
+            """{"street_address":"12 St James's Square","locality":"London","postal_code":"SW1Y 4JH","country":"United Kingdom"}""",
+            token.GetClaim(JwtRegisteredClaimNames.Address).Value);
+    }
+
+    [Fact]
+    public async Task Launch_token_leaves_out_the_profile_the_user_has_not_set()
+    {
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        await client.AuthorizeAsNewUserAsync(factory);
+
+        var response = await client.GetAsync($"/api/apps/{SsoServerFactory.AppKey}/launch", CancellationToken);
+        var token = await ReadTokenAsync(response, factory.AppKeyPair);
+
+        Assert.Equal(
+            [JwtRegisteredClaimNames.Aud, JwtRegisteredClaimNames.Email, JwtRegisteredClaimNames.Exp, JwtRegisteredClaimNames.Iat,
+                JwtRegisteredClaimNames.Jti, JwtRegisteredClaimNames.Nbf, JwtRegisteredClaimNames.Sub],
+            token.Claims.Keys.Order());
     }
 
     [Fact]

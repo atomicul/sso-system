@@ -125,6 +125,10 @@ next value of the database's `LaunchTokenNumbers` sequence. Those numbers only g
 by rejecting any that isn't newer than the last it accepted for the user. Restoring the database from a backup sets the
 sequence back, and apps then reject that user's logins until the numbers catch up.
 
+The token also carries the user's [profile](#profile) as OpenID Connect claims: `given_name`, `family_name`,
+`birthdate` (`YYYY-MM-DD`), `phone_number`, and `address`, an object of `street_address`, `locality`, `region`,
+`postal_code` and `country`. Values the user hasn't set are left out.
+
 The API refuses to start without a signing key, with an invalid app, or with two apps that share a public key.
 `uv run generate-key-pair` in `deploy/` writes a key pair (see [deploy/README.md](deploy/README.md)).
 
