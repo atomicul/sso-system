@@ -9,11 +9,18 @@ namespace Sso.Client.Tests;
 public static class SsoTokens
 {
     public static string Write(
-        RSA signingKey, RSA encryptingKey, string userId, string email, long number, DateTime? expires = null)
+        RSA signingKey,
+        RSA encryptingKey,
+        string userId,
+        string email,
+        long number,
+        DateTime? expires = null,
+        string audience = ClientAppHost.ClientAppKey)
     {
         var expiry = expires ?? DateTime.UtcNow.AddMinutes(1);
         return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
         {
+            Audience = audience,
             Claims = new Dictionary<string, object>
             {
                 [JwtRegisteredClaimNames.Sub] = userId,

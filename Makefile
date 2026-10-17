@@ -49,7 +49,7 @@ dev-frontend: wait-backend ## Run only the Vite dev server, once the API is up
 
 dev-demo: dev-keys wait-database ## Run only the demo client app with dotnet watch, once the database is up
 	ConnectionStrings__Default="$(DEMO_DB_CONNECTION)" \
-		Sso__PublicKeyPath=$(DEV_KEYS)/sso.pub.pem Sso__AppPrivateKeyPath=$(DEV_KEYS)/demo.pem \
+		Sso__PublicKeyPath=$(DEV_KEYS)/sso.pub.pem Sso__AppPrivateKeyPath=$(DEV_KEYS)/demo.pem Sso__AppKey=demo \
 		dotnet watch --project $(DEMO_PROJECT)
 
 dev-database: ## Run SQL Server in Docker for development

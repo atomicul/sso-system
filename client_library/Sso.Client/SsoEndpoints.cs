@@ -37,8 +37,12 @@ public static class SsoEndpoints
     /// <param name="appPrivateKey">
     /// The app's key the SSO encrypts its tokens with; by default, the PEM private key at <c>Sso:AppPrivateKeyPath</c>.
     /// </param>
+    /// <param name="appKey">
+    /// The app's key in the SSO's <c>ClientApps</c>, which the SSO addresses its tokens to; by default, the
+    /// <c>Sso:AppKey</c> setting. Tokens addressed to any other app are rejected.
+    /// </param>
     /// <exception cref="InvalidOperationException">
-    /// When a key isn't given and its setting is missing, or the user store can't keep authentication tokens, which
+    /// When a key or the app's key isn't given and its setting is missing, or the user store can't keep authentication tokens, which
     /// the callback needs to accept each token once.
     /// </exception>
     public static IEndpointConventionBuilder MapSsoIdentityApi<TUser>(
@@ -46,7 +50,8 @@ public static class SsoEndpoints
         string callbackPattern = "/sso",
         string redirectTo = "/",
         SecurityKey? ssoPublicKey = null,
-        SecurityKey? appPrivateKey = null)
+        SecurityKey? appPrivateKey = null,
+        string? appKey = null)
         where TUser : IdentityUser, new()
     {
         var configuration = endpoints.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -54,6 +59,7 @@ public static class SsoEndpoints
         var callback = new SsoCallback<TUser>(
             ssoPublicKey ?? LoadRsaKey(configuration, "Sso:PublicKeyPath"),
             appPrivateKey ?? LoadRsaKey(configuration, "Sso:AppPrivateKeyPath"),
+            appKey ?? Require(configuration, "Sso:AppKey"),
             redirectTo);
 
         var sso = endpoints.MapGroup("");
@@ -97,14 +103,18 @@ public static class SsoEndpoints
 
     private static RsaSecurityKey LoadRsaKey(IConfiguration configuration, string key)
     {
-        var path = configuration[key];
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new InvalidOperationException($"The {key} setting is required, or pass the key to MapSsoIdentityApi.");
-        }
-
         var rsa = RSA.Create();
-        rsa.ImportFromPem(File.ReadAllText(path));
+        rsa.ImportFromPem(File.ReadAllText(Require(configuration, key)));
         return new RsaSecurityKey(rsa);
+    }
+
+    private static string Require(IConfiguration configuration, string key)
+    {
+        var value = configuration[key];
+        if (string.IsNullOrEmpty(value))
+        {
+            throw new InvalidOperationException($"The {key} setting is required, or pass its value to MapSsoIdentityApi.");
+        }
+        return value;
     }
 }
