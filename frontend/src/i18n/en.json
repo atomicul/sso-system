@@ -105,7 +105,9 @@
   },
   "profile": {
     "title": "Your profile",
+    "personalInformation": "Personal information",
     "description": "Apps receive these details the next time you open them from here.",
+    "aboutYou": "About you",
     "givenName": "First name",
     "familyName": "Last name",
     "birthdate": "Birthdate",
@@ -116,6 +118,8 @@
     "region": "State or region",
     "postalCode": "Postal code",
     "country": "Country",
+    "edit": "Edit",
+    "cancel": "Cancel",
     "save": "Save",
     "saved": "Your profile is saved."
   }

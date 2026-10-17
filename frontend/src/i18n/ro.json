@@ -120,7 +120,9 @@
   },
   "profile": {
     "title": "Profilul tău",
+    "personalInformation": "Date personale",
     "description": "Aplicațiile primesc aceste date data viitoare când le deschizi de aici.",
+    "aboutYou": "Despre tine",
     "givenName": "Prenume",
     "familyName": "Nume",
     "birthdate": "Data nașterii",
@@ -131,6 +133,8 @@
     "region": "Județ sau regiune",
     "postalCode": "Cod poștal",
     "country": "Țară",
+    "edit": "Editează",
+    "cancel": "Anulează",
     "save": "Salvează",
     "saved": "Profilul tău a fost salvat."
   }

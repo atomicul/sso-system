@@ -18,9 +18,6 @@ function ProfilePage() {
 
   return (
     <Page title={t('profile.title')}>
-      <p className="text-muted-foreground text-sm">
-        {t('profile.description')}
-      </p>
       <ProfileForm />
     </Page>
   )
