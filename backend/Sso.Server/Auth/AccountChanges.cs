@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Options;
+using Sso.Server.Data;
 using Sso.Server.Validation;
 
 namespace Sso.Server.Auth;
@@ -28,7 +29,7 @@ public static class AccountChanges
     {
         var request = context.Arguments.OfType<InfoRequest>().Single();
         var services = context.HttpContext.RequestServices;
-        var users = services.GetRequiredService<UserManager<IdentityUser>>();
+        var users = services.GetRequiredService<UserManager<SsoUser>>();
         if (await users.GetUserAsync(context.HttpContext.User) is not { } user)
         {
             return await next(context);
@@ -47,7 +48,7 @@ public static class AccountChanges
         }
         if (!string.IsNullOrEmpty(request.NewPassword))
         {
-            await RenewCookieAsync(context.HttpContext, services.GetRequiredService<SignInManager<IdentityUser>>(), user);
+            await RenewCookieAsync(context.HttpContext, services.GetRequiredService<SignInManager<SsoUser>>(), user);
         }
         if (!string.IsNullOrEmpty(request.NewEmail) && request.NewEmail != user.Email)
         {
@@ -70,7 +71,7 @@ public static class AccountChanges
             return await next(context);
         }
 
-        var users = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+        var users = context.HttpContext.RequestServices.GetRequiredService<UserManager<SsoUser>>();
         var user = await users.FindByIdAsync(query["userId"].ToString());
         var pending = user is null ? null : await ReadPendingEmailAsync(users, user);
         return pending?.Email == changedEmail ? await next(context) : TypedResults.Unauthorized();
@@ -78,7 +79,7 @@ public static class AccountChanges
 
     /// <summary>Gets the email the signed-in user asked to change to, while the link that confirms it still works.</summary>
     public static async Task<Results<Ok<PendingEmailResponse>, NotFound>> GetPendingEmail(
-        ClaimsPrincipal principal, UserManager<IdentityUser> users, IOptions<DataProtectionTokenProviderOptions> tokenOptions)
+        ClaimsPrincipal principal, UserManager<SsoUser> users, IOptions<DataProtectionTokenProviderOptions> tokenOptions)
     {
         if (await users.GetUserAsync(principal) is not { } user)
         {
@@ -94,7 +95,7 @@ public static class AccountChanges
 
     /// <summary>Cancels the signed-in user's email change, so the links sent for it stop working.</summary>
     public static async Task<Results<NoContent, NotFound>> CancelPendingEmail(
-        ClaimsPrincipal principal, UserManager<IdentityUser> users)
+        ClaimsPrincipal principal, UserManager<SsoUser> users)
     {
         if (await users.GetUserAsync(principal) is not { } user)
         {
@@ -105,7 +106,7 @@ public static class AccountChanges
         return TypedResults.NoContent();
     }
 
-    private static async Task<bool> IsTakenByAnotherUserAsync(UserManager<IdentityUser> users, IdentityUser user, string? email)
+    private static async Task<bool> IsTakenByAnotherUserAsync(UserManager<SsoUser> users, SsoUser user, string? email)
     {
         if (string.IsNullOrEmpty(email))
         {
@@ -119,13 +120,13 @@ public static class AccountChanges
     /// Keeps the new email with the security stamp its link was made with: confirming the change, changing the
     /// password or resetting it renews the stamp, which also makes the link stop working.
     /// </summary>
-    private static async Task RememberPendingEmailAsync(UserManager<IdentityUser> users, IdentityUser user, string email)
+    private static async Task RememberPendingEmailAsync(UserManager<SsoUser> users, SsoUser user, string email)
     {
         var pending = new PendingEmail(email, user.SecurityStamp!, DateTimeOffset.UtcNow);
         await users.SetAuthenticationTokenAsync(user, LoginProvider, PendingTokenName, JsonSerializer.Serialize(pending));
     }
 
-    private static async Task<PendingEmail?> ReadPendingEmailAsync(UserManager<IdentityUser> users, IdentityUser user)
+    private static async Task<PendingEmail?> ReadPendingEmailAsync(UserManager<SsoUser> users, SsoUser user)
     {
         var stored = await users.GetAuthenticationTokenAsync(user, LoginProvider, PendingTokenName);
         return stored is null ? null : JsonSerializer.Deserialize<PendingEmail>(stored);
@@ -135,7 +136,7 @@ public static class AccountChanges
         ((result as INestedHttpResult)?.Result ?? result) is Ok<InfoResponse>;
 
     /// <summary>Signs the user in again when the request came with Identity's cookie; bearer tokens are left as they are.</summary>
-    private static async Task RenewCookieAsync(HttpContext context, SignInManager<IdentityUser> signInManager, IdentityUser user)
+    private static async Task RenewCookieAsync(HttpContext context, SignInManager<SsoUser> signInManager, SsoUser user)
     {
         if ((await context.AuthenticateAsync(IdentityConstants.ApplicationScheme)).Succeeded)
         {

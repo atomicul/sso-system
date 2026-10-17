@@ -1,7 +1,7 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Sso.Server.Data;
 
 namespace Sso.Server.Apps;
 
@@ -16,7 +16,7 @@ public class LaunchTokens(SigningCredentials signingCredentials, TimeSpan lifeti
 
     private readonly JsonWebTokenHandler handler = new();
 
-    public string Create(IdentityUser user, ClientApp app, long number) =>
+    public string Create(SsoUser user, ClientApp app, long number) =>
         handler.CreateToken(new SecurityTokenDescriptor
         {
             Audience = app.Key,

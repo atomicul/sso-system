@@ -13,9 +13,9 @@ A single sign-on portal for proprietary apps: an ASP.NET Core minimal API with I
 | `deploy/` | Ansible playbooks and the uv scripts that run them, to set the app and its database up on an Ubuntu host |
 | `Makefile` | Wires the projects together; none of them refers to another |
 
-Every API route lives under `/api` (`/api/auth/*`, `/api/apps`). The one exception is `GET /health`, which answers
-`Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and `make dev`; it
-is not rate limited.
+Every API route lives under `/api` (`/api/auth/*`, `/api/apps`, `/api/profile`). The one exception is `GET /health`,
+which answers `Healthy` once the API is up and can reach its database, and `503 Unhealthy` otherwise, for probes and
+`make dev`; it is not rate limited.
 
 ## Requirements
 
@@ -100,6 +100,12 @@ anyone who can read the database can forge sessions; restrict access to it accor
 every new key with that certificate. Keys created before stay readable without it until they expire after 90 days.
 Replacing or removing the certificate makes the keys it encrypted unreadable, which logs every user out.
 
+## Profile
+
+Besides the email and password Identity keeps, each user has a profile: a given and a family name, a birthdate, a
+phone number and a postal address (street, locality, region, postal code and country). `GET /api/profile` reads it and
+`PUT /api/profile` replaces it; every field may be null, and blank values are saved as null.
+
 ## Client apps
 
 The portal lists the apps configured under `ClientApps` and logs users in to them. Each app has a key of lowercase
@@ -143,7 +149,7 @@ shows an error in the user's language when it translates the code, and as the AP
 ## Email
 
 The API doesn't send emails yet: it writes every email Identity sends, such as confirmation links and password reset
-codes, to its log. Sending them for real means registering another `IEmailSender<IdentityUser>` as the transport in
+codes, to its log. Sending them for real means registering another `IEmailSender<SsoUser>` as the transport in
 `Emails.cs`; `SpaLinkEmailSender` keeps pointing the links at the SPA.
 
 ## Rate limiting

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Sso.Server.Data;
 using Sso.Server.Validation;
 
 namespace Sso.Server.Auth;
@@ -14,7 +15,7 @@ public static class AuthEndpoints
     {
         var auth = app.MapGroup("/auth").WithTags("Auth");
 
-        var identity = auth.MapIdentityApi<IdentityUser>();
+        var identity = auth.MapIdentityApi<SsoUser>();
         identity.Add(LimitEmailSending);
         identity.Add(GuardAccountChanges);
         identity.AddEndpointFilter(ValidationProblems.CodeIdentityErrors);
@@ -59,7 +60,7 @@ public static class AuthEndpoints
         && endpoint.Metadata.OfType<HttpMethodMetadata>().Any(metadata => metadata.HttpMethods.Contains(method));
 
     /// <summary>Signs the current user out by clearing the Identity cookie.</summary>
-    public static async Task<Ok> Logout(SignInManager<IdentityUser> signInManager)
+    public static async Task<Ok> Logout(SignInManager<SsoUser> signInManager)
     {
         await signInManager.SignOutAsync();
         return TypedResults.Ok();

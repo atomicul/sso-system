@@ -6,17 +6,17 @@ follow when changing the API.
 
 ## Endpoints
 
-Each feature has a folder, such as `Auth/`, holding its entities, its contracts and a `MapX` extension that maps a
-tagged group of handlers (`AuthEndpoints.MapAuth`). `Program.cs` maps every feature under the `/api` group.
+Each feature has a folder, such as `Profiles/`, holding its entities, its contracts and a `MapX` extension that maps
+a tagged group of handlers (`ProfileEndpoints.MapProfile`). `Program.cs` maps every feature under the `/api` group.
 
 Handlers are static methods that return `TypedResults`, or a `Results<…>` union when they can answer in several ways,
 so the OpenAPI document lists every response without extra attributes. Their XML doc comments, and those of the
 contracts' records, become the summaries and descriptions in the document:
 
 ```csharp
-/// <summary>Cancels the signed-in user's email change, so the links sent for it stop working.</summary>
-public static async Task<Results<NoContent, NotFound>> CancelPendingEmail(
-    ClaimsPrincipal principal, UserManager<IdentityUser> users)
+/// <summary>The user's profile.</summary>
+public static async Task<Results<Ok<Profile>, UnauthorizedHttpResult>> GetProfile(
+    ClaimsPrincipal principal, UserManager<SsoUser> users)
 ```
 
 Identity's own endpoints come from `MapIdentityApi`, under `/api/auth`. `Auth/AuthEndpoints.cs` adjusts them with
@@ -37,9 +37,15 @@ language.
   "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "errors": { "DueDate": ["An open todo can't be due in the past."] },
+  "errors": {
+    "Address.PostalCode": ["The field PostalCode must be a string or array type with a maximum length of '20'."]
+  },
   "issues": [
-    { "pointer": "#/dueDate", "detail": "An open todo can't be due in the past.", "code": "DueDateInPast" }
+    {
+      "pointer": "#/address/postalCode",
+      "detail": "The field PostalCode must be a string or array type with a maximum length of '20'.",
+      "code": "MaxLength"
+    }
   ]
 }
 ```
@@ -47,16 +53,17 @@ language.
 `Validation/ValidationProblems.cs` builds every such problem, so a rule only declares its code and message where it
 fails:
 
-- **Rules on a property** are validation attributes on the contract, e.g. `[property: Required, StringLength(200)]`.
-  They are also written into the OpenAPI document, which is where the SPA's checks come from. An attribute's error is
-  coded by the attribute's name, such as `Required` or `StringLength`.
+- **Rules on a property** are validation attributes on the contract, e.g. `[property: Phone, MaxLength(30)]`. They
+  are also written into the OpenAPI document, which is where the SPA's checks come from. An attribute's error is
+  coded by the attribute's name, such as `Phone` or `MaxLength`.
 - **Rules across properties** go in the contract's `IValidatableObject.Validate`, which returns a
   `CodedValidationResult` naming its code:
 
   ```csharp
-  if (!IsComplete && DueDate < DateOnly.FromDateTime(DateTime.UtcNow))
+  if (PostalCode is not null && Country is null)
   {
-      yield return new CodedValidationResult("DueDateInPast", "An open todo can't be due in the past.", [nameof(DueDate)]);
+      yield return new CodedValidationResult(
+          "PostalCodeWithoutCountry", "A postal code needs a country.", [nameof(Country)]);
   }
   ```
 

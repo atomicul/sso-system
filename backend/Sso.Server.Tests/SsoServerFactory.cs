@@ -71,7 +71,7 @@ public class SsoServerFactory : WebApplicationFactory<Program>, IAsyncLifetime
             ["RateLimits:Email:PermitLimit"] = "100000",
         }));
         builder.ConfigureTestServices(services =>
-            services.AddKeyedSingleton<IEmailSender<IdentityUser>>(SpaLinkEmailSender.TransportKey, Emails));
+            services.AddKeyedSingleton<IEmailSender<SsoUser>>(SpaLinkEmailSender.TransportKey, Emails));
     }
 
     /// <summary>

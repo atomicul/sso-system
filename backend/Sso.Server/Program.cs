@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -7,6 +6,7 @@ using Sso.Server;
 using Sso.Server.Apps;
 using Sso.Server.Auth;
 using Sso.Server.Data;
+using Sso.Server.Profiles;
 using Sso.Server.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +23,7 @@ if (!isGeneratingOpenApiDocument && !EF.IsDesignTime)
 }
 
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedEmail = true)
+builder.Services.AddIdentityApiEndpoints<SsoUser>(options => options.SignIn.RequireConfirmedEmail = true)
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.AddEmails();
 builder.Services.AddTrustedProxies(builder.Configuration);
@@ -85,6 +85,7 @@ var api = app.MapGroup("/api").RequireRateLimiting(RateLimits.Api);
 api.AddEndpointFilterFactory(ValidationProblems.ValidateRequests);
 api.MapAuth();
 api.MapApps();
+api.MapProfile();
 api.MapFallback(() => TypedResults.NotFound());
 app.MapFallbackToFile("index.html");
 

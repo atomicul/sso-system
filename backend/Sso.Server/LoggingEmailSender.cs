@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Identity;
+using Sso.Server.Data;
 
 namespace Sso.Server;
 
@@ -7,15 +8,15 @@ namespace Sso.Server;
 /// Stand-in for a real email service that writes Identity emails to the application log.
 /// Identity HTML-encodes links for embedding in markup, so they are decoded here to stay clickable.
 /// </summary>
-public class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEmailSender<IdentityUser>
+public class LoggingEmailSender(ILogger<LoggingEmailSender> logger) : IEmailSender<SsoUser>
 {
-    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink) =>
+    public Task SendConfirmationLinkAsync(SsoUser user, string email, string confirmationLink) =>
         Log(email, "Confirm your email", WebUtility.HtmlDecode(confirmationLink));
 
-    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink) =>
+    public Task SendPasswordResetLinkAsync(SsoUser user, string email, string resetLink) =>
         Log(email, "Reset your password", WebUtility.HtmlDecode(resetLink));
 
-    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode) =>
+    public Task SendPasswordResetCodeAsync(SsoUser user, string email, string resetCode) =>
         Log(email, "Reset your password", resetCode);
 
     private Task Log(string email, string subject, string content)
