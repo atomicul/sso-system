@@ -66,6 +66,7 @@
       "system": "Ca sistemul"
     },
     "logOut": "Deconectează-te",
+    "profile": "Profil",
     "emailAndPassword": "Email și parolă"
   },
   "apps": {
@@ -116,5 +117,21 @@
     "passwordsDiffer": "Parolele nu se potrivesc.",
     "changePassword": "Schimbă parola",
     "passwordChanged": "Parola ta a fost schimbată."
+  },
+  "profile": {
+    "title": "Profilul tău",
+    "description": "Aplicațiile primesc aceste date data viitoare când le deschizi de aici.",
+    "givenName": "Prenume",
+    "familyName": "Nume",
+    "birthdate": "Data nașterii",
+    "phoneNumber": "Număr de telefon",
+    "address": "Adresă",
+    "streetAddress": "Stradă și număr",
+    "locality": "Localitate",
+    "region": "Județ sau regiune",
+    "postalCode": "Cod poștal",
+    "country": "Țară",
+    "save": "Salvează",
+    "saved": "Profilul tău a fost salvat."
   }
 }

@@ -65,6 +65,7 @@
       "system": "System"
     },
     "logOut": "Log out",
+    "profile": "Profile",
     "emailAndPassword": "Email and password"
   },
   "apps": {
@@ -101,5 +102,21 @@
     "passwordsDiffer": "The passwords don't match.",
     "changePassword": "Change password",
     "passwordChanged": "Your password has been changed."
+  },
+  "profile": {
+    "title": "Your profile",
+    "description": "Apps receive these details the next time you open them from here.",
+    "givenName": "First name",
+    "familyName": "Last name",
+    "birthdate": "Birthdate",
+    "phoneNumber": "Phone number",
+    "address": "Address",
+    "streetAddress": "Street address",
+    "locality": "City",
+    "region": "State or region",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "save": "Save",
+    "saved": "Your profile is saved."
   }
 }

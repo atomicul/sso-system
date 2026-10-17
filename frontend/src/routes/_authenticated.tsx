@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AccountMenu } from '@/auth/account-menu'
 import { fetchSession } from '@/auth/session'
@@ -21,9 +21,9 @@ function AuthenticatedLayout() {
     <div className="flex h-svh flex-col">
       <header className="shrink-0 border-b">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 p-4">
-          <span className="font-heading font-semibold">
+          <Link to="/" className="font-heading font-semibold">
             {t('layout.title')}
-          </span>
+          </Link>
           <div className="flex items-center gap-1">
             <RefreshButton />
             <AccountMenu />

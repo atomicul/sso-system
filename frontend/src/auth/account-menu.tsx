@@ -5,6 +5,7 @@ import {
   LanguagesIcon,
   LogOutIcon,
   SunMoonIcon,
+  UserPenIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useGetApiAuthManageInfo } from '@/api/generated'
@@ -27,7 +28,10 @@ import { Button } from '@/components/ui/button'
 import { languages } from '@/i18n'
 import { type Theme, themes, useTheme } from '@/theme'
 
-/** Shows who is signed in, and lets them change their email and password, pick the language and theme or log out. */
+/**
+ * Shows who is signed in, and lets them edit their profile, change their email and password, pick the language and
+ * theme or log out.
+ */
 export function AccountMenu() {
   const { t } = useTranslation()
   const { data: user } = useGetApiAuthManageInfo()
@@ -57,6 +61,10 @@ export function AccountMenu() {
           </MenuLabel>
         </MenuGroup>
         <MenuSeparator />
+        <MenuItem onClick={() => void navigate({ to: '/profile' })}>
+          <UserPenIcon />
+          {t('accountMenu.profile')}
+        </MenuItem>
         <MenuItem onClick={() => void navigate({ to: '/account' })}>
           <KeyRoundIcon />
           {t('accountMenu.emailAndPassword')}
