@@ -36,7 +36,7 @@ the `Dockerfile` together, then run `make api` and commit the regenerated client
 | `make help` | Lists the targets; also what a bare `make` runs |
 | `make install` | Restores the .NET solutions and tools (`dotnet-ef`), installs the frontend packages, and syncs `deploy/` with uv |
 | `make dev` | Runs the database, the API on `:5080` with `dotnet watch` once the database is up, the Vite dev server on `:5173` once the API answers `/health`, and the demo client app on `:5090`; Vite proxies `/api` to the API |
-| `make dev-demo` | Runs only the demo client app, which the API lists as `demo` in development; opening it from the portal shows who it logged in |
+| `make dev-demo` | Runs only the demo client app, which the API lists as `demo` in development; opening it from the portal shows the user and profile it logged in |
 | `make dev-database` | Runs SQL Server in Docker on `:1433`, keeping its data in the `sso-db-data` volume |
 | `make dev-keys` | Generates the development key pairs in `.dev/keys` (`DEV_KEYS`), unless they exist: `sso.pem`, which `make dev` and `make run` sign tokens with, and `demo.pem`, the demo's |
 | `make reset-dev-database` | Deletes the `sso-db-data` volume, so the next run starts from an empty, freshly migrated database |

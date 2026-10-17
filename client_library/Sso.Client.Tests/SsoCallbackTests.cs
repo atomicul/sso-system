@@ -1,6 +1,6 @@
 using System.Net;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Sso.Client.Tests;
 
@@ -35,6 +35,43 @@ public class SsoCallbackTests(ClientAppHost host)
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal(newEmail, (await host.FindUserAsync(userId))?.Email);
+    }
+
+    [Fact]
+    public async Task Login_copies_the_profile_in_the_token()
+    {
+        var (userId, email) = NewUser();
+
+        await LogInAsync(host.CreateClient(), userId, email, number: 1, Ada);
+
+        var user = await host.FindUserAsync(userId);
+        Assert.Equal("Ada", user?.GivenName);
+        Assert.Equal("Lovelace", user?.FamilyName);
+        Assert.Equal(new DateOnly(1815, 12, 10), user?.Birthdate);
+        Assert.Equal("+44 20 7946 0000", user?.PhoneNumber);
+        Assert.Equal("12 St James's Square", user?.Address.StreetAddress);
+        Assert.Equal("London", user?.Address.Locality);
+        Assert.Null(user?.Address.Region);
+        Assert.Equal("SW1Y 4JH", user?.Address.PostalCode);
+        Assert.Equal("United Kingdom", user?.Address.Country);
+    }
+
+    [Fact]
+    public async Task Next_login_clears_the_profile_left_out_of_the_token()
+    {
+        var (userId, email) = NewUser();
+        await LogInAsync(host.CreateClient(), userId, email, number: 1, Ada);
+
+        await LogInAsync(host.CreateClient(), userId, email, number: 2,
+            new() { [JwtRegisteredClaimNames.GivenName] = "Ada" });
+
+        var user = await host.FindUserAsync(userId);
+        Assert.Equal("Ada", user?.GivenName);
+        Assert.Null(user?.FamilyName);
+        Assert.Null(user?.Birthdate);
+        Assert.Null(user?.PhoneNumber);
+        Assert.Null(user?.Address.StreetAddress);
+        Assert.Null(user?.Address.Country);
     }
 
     [Fact]
@@ -159,7 +196,7 @@ public class SsoCallbackTests(ClientAppHost host)
     {
         await using var app = host.CreateApp([]);
 
-        Assert.Throws<InvalidOperationException>(() => app.MapSsoIdentityApi<IdentityUser>());
+        Assert.Throws<InvalidOperationException>(() => app.MapSsoIdentityApi<SsoUser>());
     }
 
     [Fact]
@@ -167,14 +204,32 @@ public class SsoCallbackTests(ClientAppHost host)
     {
         await using var app = host.CreateApp([]);
 
-        app.MapSsoIdentityApi<IdentityUser>(
+        app.MapSsoIdentityApi<SsoUser>(
             ssoPublicKey: new Microsoft.IdentityModel.Tokens.RsaSecurityKey(host.SsoKey),
             appPrivateKey: new Microsoft.IdentityModel.Tokens.RsaSecurityKey(host.AppKey),
             appKey: ClientAppHost.ClientAppKey);
     }
 
+    private static readonly Dictionary<string, object> Ada = new()
+    {
+        [JwtRegisteredClaimNames.GivenName] = "Ada",
+        [JwtRegisteredClaimNames.FamilyName] = "Lovelace",
+        [JwtRegisteredClaimNames.Birthdate] = "1815-12-10",
+        [JwtRegisteredClaimNames.PhoneNumber] = "+44 20 7946 0000",
+        [JwtRegisteredClaimNames.Address] = new Dictionary<string, object>
+        {
+            ["street_address"] = "12 St James's Square",
+            ["locality"] = "London",
+            ["postal_code"] = "SW1Y 4JH",
+            ["country"] = "United Kingdom",
+        },
+    };
+
     private static (string UserId, string Email) NewUser() => (Guid.NewGuid().ToString(), $"{Guid.NewGuid()}@test.local");
 
-    private Task<HttpResponseMessage> LogInAsync(HttpClient client, string userId, string email, long number) =>
-        client.GetAsync(SsoTokens.CallbackUrl(SsoTokens.Write(host.SsoKey, host.AppKey, userId, email, number)), CancellationToken);
+    private Task<HttpResponseMessage> LogInAsync(
+        HttpClient client, string userId, string email, long number, Dictionary<string, object>? profile = null) =>
+        client.GetAsync(
+            SsoTokens.CallbackUrl(SsoTokens.Write(host.SsoKey, host.AppKey, userId, email, number, profile: profile)),
+            CancellationToken);
 }

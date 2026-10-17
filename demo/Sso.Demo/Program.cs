@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DemoDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<DemoDbContext>();
+builder.Services.AddIdentityApiEndpoints<SsoUser>().AddEntityFrameworkStores<DemoDbContext>();
 // Cookies don't tell ports apart, so on localhost Identity's default name would clash with the SSO's own cookie.
 builder.Services.ConfigureApplicationCookie(options => options.Cookie.Name = ".Sso.Demo");
 
@@ -21,10 +21,14 @@ if (app.Environment.IsDevelopment())
 }
 
 var auth = app.MapGroup("/api/auth");
-auth.MapSsoIdentityApi<IdentityUser>();
-auth.MapPost("/logout", async (SignInManager<IdentityUser> signInManager) => await signInManager.SignOutAsync())
+auth.MapSsoIdentityApi<SsoUser>();
+auth.MapPost("/logout", async (SignInManager<SsoUser> signInManager) => await signInManager.SignOutAsync())
     .RequireAuthorization();
 
-app.MapGet("/", (ClaimsPrincipal user) => $"Signed in as {user.Identity?.Name}").RequireAuthorization();
+app.MapGet("/", async (ClaimsPrincipal principal, UserManager<SsoUser> users) =>
+        await users.GetUserAsync(principal) is { } user
+            ? Results.Ok(new { user.Email, user.GivenName, user.FamilyName, user.Birthdate, user.PhoneNumber, user.Address })
+            : Results.Unauthorized())
+    .RequireAuthorization();
 
 app.Run();
