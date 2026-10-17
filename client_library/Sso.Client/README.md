@@ -13,8 +13,8 @@ app.MapGroup("/api/auth").MapSsoIdentityApi<IdentityUser>();
 `MapSsoIdentityApi` maps Identity's endpoints and `GET /api/auth/sso?token=`, the URL to configure as the app's
 `Endpoint` in the SSO. Opening the app from the portal sends the user there with a token, and the endpoint:
 
-1. Checks the token: the SSO signed it, it was encrypted with the app's key, it hasn't expired, and it is newer than
-   the last token the user logged in with, so each token logs in once.
+1. Checks the token: the SSO signed it, it was encrypted with the app's key, it is addressed to this app, it hasn't
+   expired, and it is newer than the last token the user logged in with, so each token logs in once.
 2. Creates or updates the user's local copy with the id and email in the token. The copy only changes on the next
    login, so changes to the user in the SSO show after logging out and in again.
 3. Signs the user in with Identity's cookie and redirects them to `/`.
@@ -29,11 +29,15 @@ The endpoints that log in with or change local credentials (`/login`, `/register
 |---|---|
 | `Sso:PublicKeyPath` | The SSO's PEM public key, which its tokens are signed with |
 | `Sso:AppPrivateKeyPath` | The app's PEM private key, whose public key the SSO encrypts the app's tokens with |
+| `Sso:AppKey` | The app's key in the SSO's `ClientApps`, e.g. `billing`, which the SSO addresses the app's tokens to |
 
-Pass `ssoPublicKey` and `appPrivateKey` to `MapSsoIdentityApi` to give the keys some other way, `callbackPattern` to
-change the endpoint's route, and `redirectTo` to send users elsewhere after logging in. It throws when a key is
-missing, or when the user store doesn't keep authentication tokens, as Identity's Entity Framework store does in its
-`AspNetUserTokens` table.
+The app accepts only tokens addressed to its key. Encryption alone doesn't keep other apps' tokens out: an app can
+decrypt its own token and encrypt it again with this app's public key.
+
+Pass `ssoPublicKey`, `appPrivateKey` and `appKey` to `MapSsoIdentityApi` to give them some other way,
+`callbackPattern` to change the endpoint's route, and `redirectTo` to send users elsewhere after logging in. It throws
+when one of them is missing, or when the user store doesn't keep authentication tokens, as Identity's Entity Framework
+store does in its `AspNetUserTokens` table.
 
 The user's last token number is kept there as the `LastTokenNumber` token of the `Sso` login provider. If the SSO's
 database is ever restored from a backup, its numbers start over below the ones apps remember, and apps reject the

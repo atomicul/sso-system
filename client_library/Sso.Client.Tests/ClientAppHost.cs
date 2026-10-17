@@ -24,6 +24,9 @@ public class ClientAppHost : IAsyncLifetime
 {
     public const string RedirectTo = "/home";
 
+    /// <summary>The app's key in the SSO's <c>ClientApps</c>, which its tokens are addressed to.</summary>
+    public const string ClientAppKey = "test-app";
+
     private readonly MsSqlContainer database = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2025-latest").Build();
     private readonly DirectoryInfo keyDirectory = Directory.CreateTempSubdirectory();
     private WebApplication? app;
@@ -48,6 +51,7 @@ public class ClientAppHost : IAsyncLifetime
         {
             ["Sso:PublicKeyPath"] = ssoPublicKeyPath,
             ["Sso:AppPrivateKeyPath"] = appPrivateKeyPath,
+            ["Sso:AppKey"] = ClientAppKey,
         });
         app.MapGroup("/auth").MapSsoIdentityApi<IdentityUser>(redirectTo: RedirectTo);
         app.MapGet("/me", (ClaimsPrincipal user) => user.Identity!.Name).RequireAuthorization();

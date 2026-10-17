@@ -99,6 +99,18 @@ public class SsoCallbackTests(ClientAppHost host)
     }
 
     [Fact]
+    public async Task Token_addressed_to_another_app_is_rejected_even_when_encrypted_for_this_one()
+    {
+        var (userId, email) = NewUser();
+        var token = SsoTokens.Write(host.SsoKey, host.AppKey, userId, email, number: 1, audience: "other-app");
+
+        var response = await host.CreateClient().GetAsync(SsoTokens.CallbackUrl(token), CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Null(await host.FindUserAsync(userId));
+    }
+
+    [Fact]
     public async Task Expired_token_is_rejected()
     {
         var (userId, email) = NewUser();
@@ -157,7 +169,8 @@ public class SsoCallbackTests(ClientAppHost host)
 
         app.MapSsoIdentityApi<IdentityUser>(
             ssoPublicKey: new Microsoft.IdentityModel.Tokens.RsaSecurityKey(host.SsoKey),
-            appPrivateKey: new Microsoft.IdentityModel.Tokens.RsaSecurityKey(host.AppKey));
+            appPrivateKey: new Microsoft.IdentityModel.Tokens.RsaSecurityKey(host.AppKey),
+            appKey: ClientAppHost.ClientAppKey);
     }
 
     private static (string UserId, string Email) NewUser() => (Guid.NewGuid().ToString(), $"{Guid.NewGuid()}@test.local");

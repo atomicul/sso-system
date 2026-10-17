@@ -8,12 +8,15 @@ using Microsoft.IdentityModel.Tokens;
 namespace Sso.Client;
 
 /// <summary>
-/// Logs a user in with a token of the SSO: a JWT the SSO signed, encrypted with the app's key, holding the user's id
-/// (<c>sub</c>), <c>email</c>, and a number (<c>jti</c>) that grows with every token the SSO writes. The user's last
+/// Logs a user in with a token of the SSO: a JWT the SSO signed for this app (its <c>aud</c> is the app's key),
+/// encrypted with the app's key, holding the user's id (<c>sub</c>), <c>email</c>, and a number (<c>jti</c>) that
+/// grows with every token the SSO writes. The audience is what binds a token to the app: encryption alone doesn't,
+/// since another app can decrypt its own token and re-encrypt it with this app's public key. The user's last
 /// accepted number is kept with their authentication tokens, and a token is only accepted when its number is greater,
 /// so each token logs in once.
 /// </summary>
-internal sealed class SsoCallback<TUser>(SecurityKey ssoPublicKey, SecurityKey appPrivateKey, string redirectTo)
+internal sealed class SsoCallback<TUser>(
+    SecurityKey ssoPublicKey, SecurityKey appPrivateKey, string appKey, string redirectTo)
     where TUser : IdentityUser, new()
 {
     private const string LoginProvider = "Sso";
@@ -26,7 +29,7 @@ internal sealed class SsoCallback<TUser>(SecurityKey ssoPublicKey, SecurityKey a
         IssuerSigningKey = ssoPublicKey,
         TokenDecryptionKey = appPrivateKey,
         ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidAudience = appKey,
         ClockSkew = TimeSpan.FromSeconds(30),
     };
 
