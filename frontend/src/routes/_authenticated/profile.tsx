@@ -1,5 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { ArrowLeftIcon } from 'lucide-react'
 import { getGetApiProfileQueryOptions } from '@/api/generated'
+import { Button } from '@/components/ui/button'
 import { ProfileForm } from '@/profile/profile-form'
 
 export const Route = createFileRoute('/_authenticated/profile')({
@@ -13,7 +15,18 @@ function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-heading text-lg font-semibold">Your profile</h1>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Back to your apps"
+          nativeButton={false}
+          render={<Link to="/" />}
+        >
+          <ArrowLeftIcon />
+        </Button>
+        <h1 className="font-heading text-lg font-semibold">Your profile</h1>
+      </div>
       <ProfileForm profile={profile} />
     </div>
   )
