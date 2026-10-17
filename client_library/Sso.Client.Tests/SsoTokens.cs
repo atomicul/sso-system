@@ -15,13 +15,14 @@ public static class SsoTokens
         string email,
         long number,
         DateTime? expires = null,
-        string audience = ClientAppHost.ClientAppKey)
+        string audience = ClientAppHost.ClientAppKey,
+        Dictionary<string, object>? profile = null)
     {
         var expiry = expires ?? DateTime.UtcNow.AddMinutes(1);
         return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
         {
             Audience = audience,
-            Claims = new Dictionary<string, object>
+            Claims = new Dictionary<string, object>(profile ?? [])
             {
                 [JwtRegisteredClaimNames.Sub] = userId,
                 [JwtRegisteredClaimNames.Email] = email,

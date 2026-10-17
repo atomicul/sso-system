@@ -52,7 +52,7 @@ public static class SsoEndpoints
         SecurityKey? ssoPublicKey = null,
         SecurityKey? appPrivateKey = null,
         string? appKey = null)
-        where TUser : IdentityUser, new()
+        where TUser : SsoUser, new()
     {
         var configuration = endpoints.ServiceProvider.GetRequiredService<IConfiguration>();
         RequireAuthenticationTokens<TUser>(endpoints.ServiceProvider);

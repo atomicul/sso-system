@@ -53,7 +53,7 @@ public class ClientAppHost : IAsyncLifetime
             ["Sso:AppPrivateKeyPath"] = appPrivateKeyPath,
             ["Sso:AppKey"] = ClientAppKey,
         });
-        app.MapGroup("/auth").MapSsoIdentityApi<IdentityUser>(redirectTo: RedirectTo);
+        app.MapGroup("/auth").MapSsoIdentityApi<SsoUser>(redirectTo: RedirectTo);
         app.MapGet("/me", (ClaimsPrincipal user) => user.Identity!.Name).RequireAuthorization();
         await app.StartAsync();
 
@@ -69,7 +69,7 @@ public class ClientAppHost : IAsyncLifetime
         builder.Configuration.AddInMemoryCollection(settings);
         builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlServer(database.GetConnectionString()));
         builder.Services.AddAuthorization();
-        builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<UsersDbContext>();
+        builder.Services.AddIdentityApiEndpoints<SsoUser>().AddEntityFrameworkStores<UsersDbContext>();
         return builder.Build();
     }
 
@@ -80,10 +80,10 @@ public class ClientAppHost : IAsyncLifetime
             BaseAddress = App.GetTestServer().BaseAddress,
         };
 
-    public async Task<IdentityUser?> FindUserAsync(string id)
+    public async Task<SsoUser?> FindUserAsync(string id)
     {
         using var scope = App.Services.CreateScope();
-        return await scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>().FindByIdAsync(id);
+        return await scope.ServiceProvider.GetRequiredService<UserManager<SsoUser>>().FindByIdAsync(id);
     }
 
     public async ValueTask DisposeAsync()
@@ -97,5 +97,5 @@ public class ClientAppHost : IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    private sealed class UsersDbContext(DbContextOptions<UsersDbContext> options) : IdentityDbContext<IdentityUser>(options);
+    private sealed class UsersDbContext(DbContextOptions<UsersDbContext> options) : IdentityDbContext<SsoUser>(options);
 }

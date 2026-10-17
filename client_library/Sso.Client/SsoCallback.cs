@@ -9,15 +9,15 @@ namespace Sso.Client;
 
 /// <summary>
 /// Logs a user in with a token of the SSO: a JWT the SSO signed for this app (its <c>aud</c> is the app's key),
-/// encrypted with the app's key, holding the user's id (<c>sub</c>), <c>email</c>, and a number (<c>jti</c>) that
-/// grows with every token the SSO writes. The audience is what binds a token to the app: encryption alone doesn't,
+/// encrypted with the app's key, holding the user's id (<c>sub</c>), <c>email</c>, profile (see
+/// <see cref="ProfileClaims"/>), and a number (<c>jti</c>) that grows with every token the SSO writes. The audience is what binds a token to the app: encryption alone doesn't,
 /// since another app can decrypt its own token and re-encrypt it with this app's public key. The user's last
 /// accepted number is kept with their authentication tokens, and a token is only accepted when its number is greater,
 /// so each token logs in once.
 /// </summary>
 internal sealed class SsoCallback<TUser>(
     SecurityKey ssoPublicKey, SecurityKey appPrivateKey, string appKey, string redirectTo)
-    where TUser : IdentityUser, new()
+    where TUser : SsoUser, new()
 {
     private const string LoginProvider = "Sso";
     private const string LastTokenNumber = nameof(LastTokenNumber);
@@ -50,6 +50,7 @@ internal sealed class SsoCallback<TUser>(
     {
         var result = await handler.ValidateTokenAsync(token, validationParameters);
         if (!result.IsValid
+            || result.SecurityToken is not JsonWebToken jsonWebToken
             || !long.TryParse(result.Claims[JwtRegisteredClaimNames.Jti] as string, CultureInfo.InvariantCulture, out var number))
         {
             return null;
@@ -58,7 +59,8 @@ internal sealed class SsoCallback<TUser>(
         return new SsoIdentity(
             (string)result.Claims[JwtRegisteredClaimNames.Sub],
             (string)result.Claims[JwtRegisteredClaimNames.Email],
-            number);
+            number,
+            jsonWebToken);
     }
 
     /// <summary>
@@ -101,7 +103,8 @@ internal sealed class SsoCallback<TUser>(
         user.UserName = identity.Email;
         user.Email = identity.Email;
         user.EmailConfirmed = true;
+        ProfileClaims.CopyTo(identity.Token, user);
     }
 
-    private sealed record SsoIdentity(string UserId, string Email, long Number);
+    private sealed record SsoIdentity(string UserId, string Email, long Number, JsonWebToken Token);
 }

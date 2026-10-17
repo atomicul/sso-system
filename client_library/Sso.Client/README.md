@@ -4,19 +4,24 @@ Logs users in to an ASP.NET Core Identity app with the tokens of the SSO portal,
 registration.
 
 ```csharp
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<SsoUser>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-app.MapGroup("/api/auth").MapSsoIdentityApi<IdentityUser>();
+app.MapGroup("/api/auth").MapSsoIdentityApi<SsoUser>();
 ```
+
+The app's users are `SsoUser`s, or a class derived from it: an `IdentityUser` with the profile the SSO keeps.
+`GivenName`, `FamilyName`, `Birthdate` and `Address` (a complex type of `StreetAddress`, `Locality`, `Region`,
+`PostalCode` and `Country`) add columns to the app's users table, so add a migration after switching to it.
 
 `MapSsoIdentityApi` maps Identity's endpoints and `GET /api/auth/sso?token=`, the URL to configure as the app's
 `Endpoint` in the SSO. Opening the app from the portal sends the user there with a token, and the endpoint:
 
 1. Checks the token: the SSO signed it, it was encrypted with the app's key, it is addressed to this app, it hasn't
    expired, and it is newer than the last token the user logged in with, so each token logs in once.
-2. Creates or updates the user's local copy with the id and email in the token. The copy only changes on the next
-   login, so changes to the user in the SSO show after logging out and in again.
+2. Creates or updates the user's local copy with the id, email and profile in the token, replacing the whole
+   profile, so values the user cleared in the SSO are cleared too. The copy only changes on the next login, so changes
+   to the user in the SSO show after logging out and in again.
 3. Signs the user in with Identity's cookie and redirects them to `/`.
 
 The endpoints that log in with or change local credentials (`/login`, `/register`, `/refresh`, `/confirmEmail`,
