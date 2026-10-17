@@ -7,11 +7,12 @@ namespace Sso.Server.Apps;
 
 /// <summary>
 /// Writes the tokens that log users in to apps: JWTs signed with the SSO's key, then encrypted with the app's public
-/// key. Each carries the user's id and email, and a number that only grows, so the app can accept each token once.
+/// key. Each carries the user's id and email, and a number that only grows, so the app can accept each token once,
+/// and expires after <paramref name="lifetime"/>.
 /// </summary>
-public class LaunchTokens(SigningCredentials signingCredentials)
+public class LaunchTokens(SigningCredentials signingCredentials, TimeSpan lifetime)
 {
-    public static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(60);
+    public TimeSpan Lifetime => lifetime;
 
     private readonly JsonWebTokenHandler handler = new();
 
@@ -25,7 +26,7 @@ public class LaunchTokens(SigningCredentials signingCredentials)
                 [JwtRegisteredClaimNames.Email] = user.Email!,
                 [JwtRegisteredClaimNames.Jti] = number.ToString(CultureInfo.InvariantCulture),
             },
-            Expires = DateTime.UtcNow + Lifetime,
+            Expires = DateTime.UtcNow + lifetime,
             SigningCredentials = signingCredentials,
             EncryptingCredentials = app.EncryptingCredentials,
         });

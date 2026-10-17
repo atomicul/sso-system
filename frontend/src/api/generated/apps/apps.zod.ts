@@ -29,7 +29,7 @@ export const GetApiAppsKeyIconResponse = zod.void()
 
 /**
  * @summary Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to
-the app once, within a minute.
+the app once, before the token expires.
  */
 export const GetApiAppsKeyLaunchParams = zod.object({
   "key": zod.string()
