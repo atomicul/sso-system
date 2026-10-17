@@ -122,10 +122,10 @@ letters, digits and dashes, which names it in URLs and in its icon's file name:
 
 The token is a JWT signed (RS256) with the SSO's private key at `SigningKey:Path`, then encrypted (RSA-OAEP with
 A256CBC-HS512) with the app's public key, so only that app can read it and only the SSO can have written it. It holds
-the user's id (`sub`) and `email`, expires after a minute, and its `jti` is the next value of the database's
-`LaunchTokenNumbers` sequence. Those numbers only grow, so an app accepts each token once by rejecting any that isn't
-newer than the last it accepted for the user. Restoring the database from a backup sets the sequence back, and apps
-then reject that user's logins until the numbers catch up.
+the user's id (`sub`) and `email`, expires after `LaunchTokens:Lifetime` (a minute by default), and its `jti` is the
+next value of the database's `LaunchTokenNumbers` sequence. Those numbers only grow, so an app accepts each token once
+by rejecting any that isn't newer than the last it accepted for the user. Restoring the database from a backup sets the
+sequence back, and apps then reject that user's logins until the numbers catch up.
 
 The API refuses to start without a signing key, with an invalid app, or with two apps that share a public key.
 `uv run generate-key-pair` in `deploy/` writes a key pair (see [deploy/README.md](deploy/README.md)).

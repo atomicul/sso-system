@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
@@ -7,9 +8,9 @@ namespace Sso.Server.Apps;
 /// <summary>
 /// Reads the apps under <c>ClientApps</c>, keyed by the app's key, each with a <c>Name</c>, the <c>Endpoint</c> that
 /// receives its tokens and the <c>PublicKeyPath</c> of the PEM key they are encrypted with. Their icons are read from
-/// <c>AppIcons:Directory</c>, and tokens are signed with the PEM private key at <c>SigningKey:Path</c>. Fails on start
-/// when a setting is missing or invalid, or when two apps share a public key, which would let each read the other's
-/// tokens.
+/// <c>AppIcons:Directory</c>, and tokens are signed with the PEM private key at <c>SigningKey:Path</c> and expire after
+/// <c>LaunchTokens:Lifetime</c>. Fails on start when a setting is missing or invalid, or when two apps share a public
+/// key, which would let each read the other's tokens.
 /// </summary>
 public static partial class ClientApps
 {
@@ -20,10 +21,11 @@ public static partial class ClientApps
         var apps = ReadApps(configuration);
         var iconDirectory = configuration["AppIcons:Directory"];
         var signingKey = LoadRsaKey(Require(configuration, "SigningKey:Path"));
+        var tokenLifetime = TimeSpan.Parse(Require(configuration, "LaunchTokens:Lifetime"), CultureInfo.InvariantCulture);
 
         return services
             .AddSingleton(new ClientAppCatalog(apps, string.IsNullOrEmpty(iconDirectory) ? null : Path.GetFullPath(iconDirectory)))
-            .AddSingleton(new LaunchTokens(new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256)));
+            .AddSingleton(new LaunchTokens(new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256), tokenLifetime));
     }
 
     private static List<ClientApp> ReadApps(IConfiguration configuration)

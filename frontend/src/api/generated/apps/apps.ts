@@ -257,7 +257,7 @@ export const getGetApiAppsKeyLaunchUrl = (key: string,) => {
 
 /**
  * @summary Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to
-the app once, within a minute.
+the app once, before the token expires.
  */
 export const getApiAppsKeyLaunch = async (key: string, options?: Parameters<typeof fetcher>[1]): Promise<unknown> => {
 
@@ -329,7 +329,7 @@ export function useGetApiAppsKeyLaunch<TData = Awaited<ReturnType<typeof getApiA
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to
-the app once, within a minute.
+the app once, before the token expires.
  */
 
 export function useGetApiAppsKeyLaunch<TData = Awaited<ReturnType<typeof getApiAppsKeyLaunch>>, TError = ErrorType<void>>(

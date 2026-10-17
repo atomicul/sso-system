@@ -527,7 +527,7 @@
         "tags": [
           "Apps"
         ],
-        "summary": "Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to\nthe app once, within a minute.",
+        "summary": "Redirects the user to the app's endpoint with a token in its `token` query parameter, which logs them in to\nthe app once, before the token expires.",
         "parameters": [
           {
             "name": "key",

@@ -34,7 +34,7 @@ public static class AppEndpoints
 
     /// <summary>
     /// Redirects the user to the app's endpoint with a token in its <c>token</c> query parameter, which logs them in to
-    /// the app once, within a minute.
+    /// the app once, before the token expires.
     /// </summary>
     public static async Task<Results<RedirectHttpResult, NotFound, UnauthorizedHttpResult>> Launch(
         string key,

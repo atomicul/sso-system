@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Web;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Sso.Server.Apps;
@@ -77,7 +78,7 @@ public class AppsTests(SsoServerFactory factory) : IDisposable
         Assert.True(token.IsValid);
         Assert.Equal(email, token.Claims[JwtRegisteredClaimNames.Email]);
         Assert.False(string.IsNullOrEmpty((string)token.Claims[JwtRegisteredClaimNames.Sub]));
-        Assert.InRange(token.SecurityToken.ValidTo, DateTime.UtcNow, DateTime.UtcNow + LaunchTokens.Lifetime);
+        Assert.InRange(token.SecurityToken.ValidTo, DateTime.UtcNow, DateTime.UtcNow + factory.Services.GetRequiredService<LaunchTokens>().Lifetime);
     }
 
     [Fact]
