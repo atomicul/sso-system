@@ -70,9 +70,10 @@ fails:
   their keys. They are not about one field of the request, so their issues have no pointer.
 
 The endpoint filter that runs the rules, `ValidationProblems.ValidateRequests`, replaces ASP.NET's `AddValidation`,
-whose results carry only messages. It validates every handler argument whose type has rules, but only that argument's
-own properties: an object or collection nested in a contract is not validated. Contracts are flat today; extend the
-filter before nesting one.
+whose results carry only messages. It validates every handler argument whose type has rules, and the objects nested
+in its properties whose types have rules too, whose errors are about members under the property's name, as in
+`Address.PostalCode` with the pointer `#/address/postalCode`. Collections in a contract are not validated; extend the
+filter before adding one.
 
 ## The OpenAPI document
 
