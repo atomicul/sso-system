@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 
+from sso_deploy.passwords import generate_password
 from sso_deploy.runner import add_release_argument, argument_parser, run_playbook
 
 
@@ -46,4 +47,5 @@ def main() -> None:
         "sso_client_apps_source": str(args.client_apps or ""),
         "sso_controller_directory": os.getcwd(),
     }
-    sys.exit(run_playbook("webapp.yml", args, variables=variables))
+    secrets = {"SSO_GENERATED_CERTIFICATE_PASSWORD": generate_password()}
+    sys.exit(run_playbook("webapp.yml", args, variables=variables, secrets=secrets))

@@ -55,7 +55,8 @@ It only asks for what the host doesn't have yet:
 - The connection string the app connects to its database with: the one `setup-database` showed when it set the
   database up on the same host, or one to any other SQL Server.
 - The PFX certificate that encrypts the app's Data Protection keys: press Enter to generate one, saved locally as its
-  backup, or type the path of an existing PFX. Either way, it then asks for the PFX's password.
+  backup, or type the path of an existing PFX. Either way, it then asks for the PFX's password. For a new PFX, press
+  Enter to generate a password, which it **shows once**.
 - The RSA key the SSO signs its tokens with: press Enter to generate one with `generate-key-pair`, saved locally as
   its backup next to its public key (`<host>-sso-signing.pem` and `<host>-sso-signing.pub.pem` by default), or type
   the path of an existing PEM private key. Client apps check the SSO's tokens with the public key.
