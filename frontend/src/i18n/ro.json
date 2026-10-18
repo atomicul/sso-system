@@ -1,0 +1,131 @@
+{
+  "errors": {
+    "network": "Nu am putut contacta serverul. Verifică-ți conexiunea și încearcă din nou.",
+    "requestFailed": "Cererea a eșuat cu codul {{status}}",
+    "tooManyRequests_one": "Hopa, mai încet! Ia o pauză și încearcă din nou peste {{count}} secundă.",
+    "tooManyRequests_few": "Hopa, mai încet! Ia o pauză și încearcă din nou peste {{count}} secunde.",
+    "tooManyRequests_other": "Hopa, mai încet! Ia o pauză și încearcă din nou peste {{count}} de secunde.",
+    "tooManyRequestsSoon": "Hopa, mai încet! Ia o pauză și încearcă din nou în câteva clipe.",
+    "unknown": "Ceva nu a mers bine."
+  },
+  "credentials": {
+    "email": "Email",
+    "password": "Parolă"
+  },
+  "login": {
+    "title": "Autentificare",
+    "description": "Bine ai revenit! Autentifică-te ca să-ți vezi sarcinile.",
+    "newHere": "Ești nou aici?",
+    "createAccount": "Creează un cont",
+    "submit": "Autentifică-te",
+    "notAllowed": "Confirmă-ți adresa de email înainte să te autentifici.",
+    "lockedOut": "Prea multe încercări eșuate. Încearcă din nou peste câteva minute.",
+    "requiresTwoFactor": "Acest cont folosește autentificarea în doi pași, pe care aplicația nu o suportă încă.",
+    "invalidCredentials": "Adresă de email sau parolă incorectă."
+  },
+  "register": {
+    "title": "Creează un cont",
+    "description": "Înregistrează-te ca să începi să-ți urmărești sarcinile.",
+    "haveAccount": "Ai deja un cont?",
+    "logIn": "Autentifică-te",
+    "submit": "Creează contul",
+    "emailRules": "Introdu o adresă de email validă.",
+    "passwordRules": "Folosește cel puțin 6 caractere, cu o literă mare, o literă mică, o cifră și un simbol.",
+    "checkEmail": "Verifică-ți emailul",
+    "linkSent": "Ți-am trimis un link de confirmare la {{email}}. Deschide-l ca să-ți activezi contul, apoi autentifică-te.",
+    "goToLogIn": "Mergi la autentificare"
+  },
+  "confirmEmail": {
+    "confirmed": "Email confirmat",
+    "confirmedDescription": "Îți mulțumim că ți-ai confirmat emailul. Acum te poți autentifica.",
+    "logIn": "Autentifică-te",
+    "invalid": "Link invalid sau expirat",
+    "invalidDescription": "Nu ți-am putut confirma emailul cu acest link. Încearcă să te autentifici ca să primești unul nou.",
+    "backToLogIn": "Înapoi la autentificare",
+    "changed": "Email schimbat",
+    "changedDescription": "Contul tău folosește acum {{email}}. De acum înainte, autentifică-te cu el."
+  },
+  "resendConfirmation": {
+    "resend": "Retrimite emailul de confirmare",
+    "resendIn": "Retrimite emailul de confirmare în {{seconds}}s",
+    "sent": "Ți-am trimis un nou link de confirmare la {{email}}."
+  },
+  "layout": {
+    "todos": "Sarcini",
+    "refresh": "Reîmprospătează"
+  },
+  "accountMenu": {
+    "open": "Meniul contului",
+    "title": "Cont",
+    "signedInAs": "Conectat ca",
+    "language": "Limbă",
+    "theme": "Temă",
+    "themes": {
+      "light": "Luminoasă",
+      "dark": "Întunecată",
+      "system": "Ca sistemul"
+    },
+    "logOut": "Deconectează-te",
+    "emailAndPassword": "Email și parolă"
+  },
+  "todos": {
+    "title": "Titlu",
+    "titlePlaceholder": "Ce ai de făcut?",
+    "dueDate": "Termen",
+    "add": "Adaugă",
+    "save": "Salvează",
+    "edit": "Editează {{title}}",
+    "editTitle": "Editează sarcina",
+    "delete": "Șterge {{title}}",
+    "markDone": "Marchează {{title}} ca finalizată",
+    "markOpen": "Marchează {{title}} ca nefinalizată",
+    "due": "Termen: {{date, datetime(dateStyle: medium)}}",
+    "loading": "Se încarcă sarcinile…",
+    "empty": "Nimic de făcut încă. Adaugă prima sarcină mai sus."
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "description": "Pagina pe care o cauți nu există sau a fost mutată.",
+    "back": "Înapoi la sarcini"
+  },
+  "validationErrors": {
+    "DueDateInPast": "O sarcină nefinalizată nu poate avea termenul în trecut.",
+    "InvalidEmail": "Adresa de email nu este validă.",
+    "InvalidUserName": "Adresa de email conține caractere nepermise.",
+    "DuplicateUserName": "Există deja un cont cu această adresă de email.",
+    "DuplicateEmail": "Există deja un cont cu această adresă de email.",
+    "PasswordTooShort": "Parola este prea scurtă.",
+    "PasswordRequiresNonAlphanumeric": "Parola trebuie să conțină cel puțin un simbol.",
+    "PasswordRequiresDigit": "Parola trebuie să conțină cel puțin o cifră.",
+    "PasswordRequiresLower": "Parola trebuie să conțină cel puțin o literă mică.",
+    "PasswordRequiresUpper": "Parola trebuie să conțină cel puțin o literă mare.",
+    "PasswordRequiresUniqueChars": "Parola trebuie să conțină mai multe caractere diferite.",
+    "PasswordMismatch": "Parola actuală este greșită.",
+    "OldPasswordRequired": "Introdu parola actuală ca să setezi una nouă."
+  },
+  "page": {
+    "back": "Înapoi"
+  },
+  "account": {
+    "title": "Email și parolă",
+    "email": "Email",
+    "currentEmail": "Te autentifici cu {{email}}.",
+    "pendingEmail": "Așteptăm să confirmi {{email}}. Deschide linkul pe care ți l-am trimis acolo ca să termini schimbarea; până atunci, autentifică-te în continuare cu emailul actual.",
+    "resendLink": "Retrimite linkul",
+    "resendLinkIn": "Retrimite linkul în {{seconds}}s",
+    "cancelEmailChange": "Anulează schimbarea",
+    "emailChangeCancelled": "Schimbarea la {{email}} a fost anulată.",
+    "newEmail": "Email nou",
+    "changeEmail": "Schimbă emailul",
+    "emailLinkSent": "Ți-am trimis un link de confirmare la {{email}}.",
+    "password": "Parolă",
+    "passwordDescription": "Schimbarea ei te deconectează de peste tot în altă parte.",
+    "currentPassword": "Parola actuală",
+    "currentPasswordRequired": "Introdu parola actuală.",
+    "newPassword": "Parola nouă",
+    "confirmPassword": "Confirmă parola nouă",
+    "passwordsDiffer": "Parolele nu se potrivesc.",
+    "changePassword": "Schimbă parola",
+    "passwordChanged": "Parola ta a fost schimbată."
+  }
+}
