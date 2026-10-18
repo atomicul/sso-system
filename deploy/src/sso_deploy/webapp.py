@@ -19,9 +19,9 @@ def main() -> None:
     parser = argument_parser(__doc__.partition(": ")[2])
     add_release_argument(parser)
     parser.add_argument(
-        "--change-database-password",
+        "--change-connection-string",
         action="store_true",
-        help="ask for the database password even though the host already has one",
+        help="ask for the database connection string even though the host already has one",
     )
     parser.add_argument(
         "--change-certificate",
@@ -40,7 +40,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     variables = {
-        "sso_change_database_password": args.change_database_password,
+        "sso_change_connection_string": args.change_connection_string,
         "sso_change_certificate": args.change_certificate,
         "sso_change_signing_key": args.change_signing_key,
         "sso_client_apps_source": str(args.client_apps or ""),

@@ -65,9 +65,9 @@
     path: "{{ sso_config_dir }}/signing-key.pem"
   register: sso_signing_key_installed
 
-- name: Configure the database password
+- name: Configure the database connection string
   ansible.builtin.include_tasks: database.yml
-  when: sso_change_database_password | bool or not sso_database_env.stat.exists
+  when: sso_change_connection_string | bool or not sso_database_env.stat.exists
 
 - name: Configure the Data Protection certificate
   ansible.builtin.include_tasks: certificate.yml

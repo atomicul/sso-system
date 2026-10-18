@@ -36,8 +36,8 @@ creates the `sso` login the app connects with, which can read and write the app'
 
 The first run generates two passwords:
 
-- The `sso` login's password, which it **shows once** at the end of the run and stores nowhere. `setup-webapp`
-  asks for it.
+- The `sso` login's password, which it **shows once** at the end of the run, in the connection string an app on the
+  same host connects with, and stores nowhere. `setup-webapp` asks for that connection string.
 - The `sa` password, kept for later migrations in `/etc/sso/database-admin.env`, which only root can read.
 
 SQL Server listens on `127.0.0.1` only. It runs as the Express edition, which is free in production; set
@@ -52,14 +52,15 @@ certificate, and from then on HTTPS on port `443` as well. To terminate HTTPS in
 
 It only asks for what the host doesn't have yet:
 
-- The `sso` database password, which `setup-database` showed.
+- The connection string the app connects to its database with: the one `setup-database` showed when it set the
+  database up on the same host, or one to any other SQL Server.
 - The PFX certificate that encrypts the app's Data Protection keys: press Enter to generate one, saved locally as its
   backup, or type the path of an existing PFX. Either way, it then asks for the PFX's password.
 - The RSA key the SSO signs its tokens with: press Enter to generate one with `generate-key-pair`, saved locally as
   its backup next to its public key (`<host>-sso-signing.pem` and `<host>-sso-signing.pub.pem` by default), or type
   the path of an existing PEM private key. Client apps check the SSO's tokens with the public key.
 
-To change any of them on a host that has them, pass `--change-database-password`, `--change-certificate` or
+To change any of them on a host that has them, pass `--change-connection-string`, `--change-certificate` or
 `--change-signing-key`. Replacing the certificate logs every user out, and losing it does too: keep the PFX and its
 password. Replacing the signing key makes client apps reject logins until they have its new public key.
 
